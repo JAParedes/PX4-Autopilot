@@ -3,7 +3,10 @@
         {
             "name": "PX4",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/lib",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/lib"
             ],
             "defines": [],
             "macFrameworkPath": [],
