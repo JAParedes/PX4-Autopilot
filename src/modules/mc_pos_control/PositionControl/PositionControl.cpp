@@ -44,6 +44,7 @@
 
 using namespace matrix;
 
+
 void PositionControl::setVelocityGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
 {
 	_gain_vel_p = P;
@@ -127,12 +128,18 @@ bool PositionControl::update(const float dt)
 
 void PositionControl::_positionControl()
 {
+	RCAC _rcac_pos_x(10.0,1.0,1.0);
+	RCAC _rcac_pos_y(10.0,1.0,1.0);
+	RCAC _rcac_pos_z(10.0,1.0,1.0);
+
+	_rcac_pos_x.compute_uk(z_k_Pr_R(1,0),z_k_Pr_R(1,0)-z_km1_Pr_R(1,0),z_k_Pr_R(1,0)+z_km1_Pr_R(1,0),u_km1_Pr_R(1,0));
+	_rcac_pos_y.compute_uk(z_k_Pr_R(2,0),z_k_Pr_R(2,0)-z_km1_Pr_R(2,0),z_k_Pr_R(2,0)+z_km1_Pr_R(2,0),u_km1_Pr_R(2,0));
+	_rcac_pos_z.compute_uk(z_k_Pr_R(3,0),z_k_Pr_R(3,0)-z_km1_Pr_R(3,0),z_k_Pr_R(3,0)+z_km1_Pr_R(3,0),u_km1_Pr_R(3,0));
+
 	// P-position controller
 	Vector3f vel_sp_position = (_pos_sp - _pos).emult(_gain_pos_p);
 
-	z_k_Pr_R = (_pos_sp - _pos);
 	u_k_Pr_R.setZero();
-	if (RCAC_Pr_ON)
 	{
 	        ii_Pr_R += 1;
 
@@ -543,3 +550,6 @@ void PositionControl::init_RCAC(float rcac_pos_p0, float rcac_vel_p0) {
 		ii_Pr_R = 0;
 		ii_Pv_R = 0;
 	}
+
+
+
