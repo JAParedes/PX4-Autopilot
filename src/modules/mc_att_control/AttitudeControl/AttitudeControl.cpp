@@ -110,7 +110,7 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 		u_k_Pq_R(0) = _rcac_att_x.compute_uk(-z_k_Pq_R(0), 0, 0, _rcac_att_x.get_rcac_uk());
 		u_k_Pq_R(1) = _rcac_att_y.compute_uk(-z_k_Pq_R(1), 0, 0, _rcac_att_y.get_rcac_uk());
 		u_k_Pq_R(2) = _rcac_att_z.compute_uk(-z_k_Pq_R(2), 0, 0, _rcac_att_z.get_rcac_uk());
-
+		++ii_Pq_R;
 		}
 	}
 

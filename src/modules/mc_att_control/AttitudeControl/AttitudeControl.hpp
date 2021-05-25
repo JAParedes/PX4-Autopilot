@@ -217,26 +217,29 @@ public:
 	 */
 	void init_RCAC_att()
 	{
+		_rcac_att_x = RCAC(rcac_att_P0);
+		_rcac_att_y = RCAC(rcac_att_P0);
+		_rcac_att_z = RCAC(rcac_att_P0);
 		// P_Pq_R = eye<float, 3>() * 0.010;
 		// N1_Pq = eye<float, 3>();
 		// I3 = eye<float, 3>();
-		P_Pq_R.setZero();
-		N1_Pq.setZero();
-		I3.setZero();
-		for (int i = 0; i <= 2; i++) {
-			P_Pq_R(i,i) = 0.01f;
-			P_Pq_R(i,i) = rcac_att_P0;
-			N1_Pq(i,i) = 1.0f;
-			I3(i,i) = 1.0f;
-		}
-		phi_k_Pq_R.setZero();
-		phi_km1_Pq_R.setZero();
-		theta_k_Pq_R.setZero();
-		z_k_Pq_R.setZero();
-		z_km1_Pq_R.setZero();
-		u_k_Pq_R.setZero();
-		u_km1_Pq_R.setZero();
-		Gamma_Pq_R.setZero();
+		// P_Pq_R.setZero();
+		// N1_Pq.setZero();
+		// I3.setZero();
+		// for (int i = 0; i <= 2; i++) {
+		// 	P_Pq_R(i,i) = 0.01f;
+		// 	P_Pq_R(i,i) = rcac_att_P0;
+		// 	N1_Pq(i,i) = 1.0f;
+		// 	I3(i,i) = 1.0f;
+		// }
+		// phi_k_Pq_R.setZero();
+		// phi_km1_Pq_R.setZero();
+		// theta_k_Pq_R.setZero();
+		// z_k_Pq_R.setZero();
+		// z_km1_Pq_R.setZero();
+		// u_k_Pq_R.setZero();
+		// u_km1_Pq_R.setZero();
+		// Gamma_Pq_R.setZero();
 	}
 
 	/**
