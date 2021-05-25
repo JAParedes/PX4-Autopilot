@@ -68,20 +68,50 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 	Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
 
 	//PX4_INFO("Rate Controller:\t%8.4f", (double)dt);
-	if (landed)
+	z_k_rate = rate_error;
+
+	u_k_rate.setZero();
+
+	if (!landed)
 	{
+		if (RCAC_Aw_ON)
+		{
+			if (ii_AC_R == 0) {
+				init_RCAC_rate();
+				// Initial derivative will be zero.
+				z_km1_rate = z_k_rate;
+			}
+
+			matrix::Vector3f d_z_k_rate = z_k_rate - z_km1_rate;
+
+			// TODO: DERIV IS NOT IMPLMENTED PROPERLY. 0 IS PLACED AS PLACEHOLDER
+			// TODO: To implement derivative properly, I need to reenable ii_AC_R varible.
+			u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), _rate_int(0), d_z_k_rate(0), _rcac_rate_x.get_rcac_uk());
+			u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), _rate_int(1), d_z_k_rate(1), _rcac_rate_y.get_rcac_uk());
+			u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), _rate_int(2), d_z_k_rate(2), _rcac_rate_z.get_rcac_uk());
+			++ii_AC_R;
+		}
+
+		updateIntegral(rate_error, dt);
+	}
+	else
+	{
+		// Set iteration tracking variable to zero if the plane/QC has landed
 		ii_AC_R = 0;
 		// ii_Pq_R = 0;
 	}
-	z_k_rate = rate_error;
-	u_k_rate.setZero();
-	if (!landed && RCAC_Aw_ON)
-	{
-		// TODO: DERIV IS NOT IMPLMENTED PROPERLY. 0 IS PLACED AS PLACEHOLDER
-		u_k_rate(0) = _rcac_rate_x.compute_uk(z_k_rate(0), _rate_int(0), 0, _rcac_rate_x.get_rcac_uk());
-		u_k_rate(1) = _rcac_rate_y.compute_uk(z_k_rate(1), _rate_int(1), 0, _rcac_rate_y.get_rcac_uk());
-		u_k_rate(2) = _rcac_rate_z.compute_uk(z_k_rate(2), _rate_int(2), 0, _rcac_rate_z.get_rcac_uk());
-		// ii_AC_R = ii_AC_R + 1;
+
+	torque = alpha_PID_rate*torque+u_k_rate;
+	z_km1_rate = z_k_rate;
+
+	return torque;
+
+	// if (!landed && RCAC_Aw_ON)
+	// {
+
+
+
+		// ii_AC_R = ii_AC_R +
 		// if (ii_AC_R == 1)
 		// {
 		// 	init_RCAC_rate();
@@ -148,16 +178,14 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 		// phi_km1_rate_x = phi_k_rate_x;
 		// phi_km1_rate_y = phi_k_rate_y;
 		// phi_km1_rate_z = phi_k_rate_z;
-	}
+	// }
 	//torque = alpha_PID*torque+u_k_rate;
-	torque = alpha_PID_rate*torque+u_k_rate;
+	// torque = alpha_PID_rate*torque+u_k_rate;
 
 	// update integral only if we are not landed
-	if (!landed) {
-		updateIntegral(rate_error, dt);
-	}
-
-	return torque;
+	// if (!landed) {
+	// 	updateIntegral(rate_error, dt);
+	// }
 }
 
 void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
