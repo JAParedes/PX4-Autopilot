@@ -51,6 +51,7 @@
 #include <matrix/matrix/math.hpp>
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/mathlib.h>
+#include <px4_log.h>
 
 class AttitudeControl
 {
