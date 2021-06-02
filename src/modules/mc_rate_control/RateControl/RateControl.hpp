@@ -229,8 +229,8 @@ public:
 	 * 	@see P_rate_x
 	 * 	@return RCAC P(1,1) of the Rate controller
 	 */
-	const float &get_RCAC_P11_Ratex() { return P_rate_x(0,0); }
-
+	const float &get_RCAC_P11_Ratex() { return rcac_rate_P0; }
+		//return P_rate_x(0,0)
 	/**
 	 * 	Set RCAC variables.
 	 * 	@see all RCAC variables

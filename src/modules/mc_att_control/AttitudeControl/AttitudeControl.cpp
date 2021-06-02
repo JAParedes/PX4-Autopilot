@@ -105,11 +105,13 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 		{
 			if (ii_Pq_R == 0) {
 				init_RCAC_att();
+				//Make sure that u_km1_Pq_R is valid.
+				u_km1_Pq_R = u_k_Pq_R;
 			}
 			// PX4_INFO("get_rcac_uk: %1.6f | %1.6f | %1.6f", (double)_rcac_att_x.get_rcac_uk(), (double)_rcac_att_y.get_rcac_uk(), (double)_rcac_att_z.get_rcac_uk());
-			u_k_Pq_R(0) = _rcac_att_x.compute_uk(z_k_Pq_R(0), 0, 0, _rcac_att_x.get_rcac_uk());
-			u_k_Pq_R(1) = _rcac_att_y.compute_uk(z_k_Pq_R(1), 0, 0, _rcac_att_y.get_rcac_uk());
-			u_k_Pq_R(2) = _rcac_att_z.compute_uk(z_k_Pq_R(2), 0, 0, _rcac_att_z.get_rcac_uk());
+			u_k_Pq_R(0) = _rcac_att_x.compute_uk(-z_k_Pq_R(0), 0, 0, u_km1_Pq_R(0));
+			u_k_Pq_R(1) = _rcac_att_y.compute_uk(-z_k_Pq_R(1), 0, 0, u_km1_Pq_R(0));
+			u_k_Pq_R(2) = _rcac_att_z.compute_uk(-z_k_Pq_R(2), 0, 0, u_km1_Pq_R(0));
 			//PX4_INFO("Hi");
 			// PX4_INFO("z_k_Pq_R: %1.6f | %1.6f | %1.6f", (double)z_k_Pq_R(0), (double)z_k_Pq_R(1), (double)z_k_Pq_R(2));
 			// PX4_INFO("u_Pq_R: %1.6f | %1.6f | %1.6f", (double)u_k_Pq_R(0), (double)u_k_Pq_R(1), (double)u_k_Pq_R(2));

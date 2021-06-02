@@ -217,8 +217,8 @@ public:
 	 * 	@see P_Pq_R
 	 * 	@return RCAC P(1,1) of the Attitude controller
 	 */
-	const float &get_RCAC_P11_Att() { return P_Pq_R(0,0); }
-
+	const float &get_RCAC_P11_Att() { return rcac_att_P0; }
+		//return P_Pq_R(0,0);
 	/**
 	 * 	Set RCAC variables.
 	 * 	@see all RCAC variables
