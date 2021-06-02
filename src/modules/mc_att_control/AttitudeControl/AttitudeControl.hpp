@@ -119,9 +119,12 @@ public:
 	{
 		matrix::Vector3f RCAC_u{};
 
-		for (int i = 0; i <= 2; i++) {
-			RCAC_u(i) = u_k_Pq_R(i);
-		}
+		RCAC_u(0) = _rcac_att_x.get_rcac_uk();
+		RCAC_u(1) = _rcac_att_y.get_rcac_uk();
+		RCAC_u(2) = _rcac_att_z.get_rcac_uk();
+		// for (int i = 0; i <= 2; i++) {
+		// 	RCAC_u(i) = u_k_Pq_R(i);
+		// }
 
 		return RCAC_u;
 	}
@@ -135,8 +138,12 @@ public:
 	{
 		matrix::Vector3f RCAC_theta{};
 
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+
 		for (int i = 0; i <= 2; i++) {
-			RCAC_theta(i) = theta_k_Pq_R(i);
+			RCAC_theta(i) = _rcac_att_x.get_rcac_theta(i);//theta_k_Pq_R(i);
 		}
 
 		return RCAC_theta;

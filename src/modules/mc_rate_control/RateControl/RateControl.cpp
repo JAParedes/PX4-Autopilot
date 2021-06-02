@@ -82,13 +82,15 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 				z_km1_rate = z_k_rate;
 			}
 
-			matrix::Vector3f d_z_k_rate = z_k_rate - z_km1_rate;
+			// matrix::Vector3f d_z_k_rate = z_k_rate - z_km1_rate;
 
 			// TODO: DERIV IS NOT IMPLMENTED PROPERLY. 0 IS PLACED AS PLACEHOLDER
-			// TODO: To implement derivative properly, I need to reenable ii_AC_R varible.
-			u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), _rate_int(0), d_z_k_rate(0), _rcac_rate_x.get_rcac_uk());
-			u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), _rate_int(1), d_z_k_rate(1), _rcac_rate_y.get_rcac_uk());
-			u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), _rate_int(2), d_z_k_rate(2), _rcac_rate_z.get_rcac_uk());
+			u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), 0 * -_rate_int(0), 0 * angular_accel(0), _rcac_rate_x.get_rcac_uk());
+			u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), 0 * -_rate_int(1), 0 * angular_accel(1), _rcac_rate_y.get_rcac_uk());
+			u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), 0 * -_rate_int(2), 0 * angular_accel(2), _rcac_rate_z.get_rcac_uk());
+			// u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), _rate_int(0), angular_accel(0), _rcac_rate_x.get_rcac_uk());
+			// u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), _rate_int(1), angular_accel(1), _rcac_rate_y.get_rcac_uk());
+			// u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), _rate_int(2), angular_accel(2), _rcac_rate_z.get_rcac_uk());
 			++ii_AC_R;
 		}
 
