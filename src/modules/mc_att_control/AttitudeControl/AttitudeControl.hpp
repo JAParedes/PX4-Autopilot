@@ -51,6 +51,7 @@
 #include <matrix/matrix/math.hpp>
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/mathlib.h>
+#include <px4_log.h>
 
 class AttitudeControl
 {
@@ -118,9 +119,12 @@ public:
 	{
 		matrix::Vector3f RCAC_u{};
 
-		for (int i = 0; i <= 2; i++) {
-			RCAC_u(i) = u_k_Pq_R(i);
-		}
+		RCAC_u(0) = _rcac_att_x.get_rcac_uk();
+		RCAC_u(1) = _rcac_att_y.get_rcac_uk();
+		RCAC_u(2) = _rcac_att_z.get_rcac_uk();
+		// for (int i = 0; i <= 2; i++) {
+		// 	RCAC_u(i) = u_k_Pq_R(i);
+		// }
 
 		return RCAC_u;
 	}
@@ -134,8 +138,12 @@ public:
 	{
 		matrix::Vector3f RCAC_theta{};
 
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
+
 		for (int i = 0; i <= 2; i++) {
-			RCAC_theta(i) = theta_k_Pq_R(i);
+			RCAC_theta(i) = _rcac_att_x.get_rcac_theta(i);//theta_k_Pq_R(i);
 		}
 
 		return RCAC_theta;
@@ -209,34 +217,37 @@ public:
 	 * 	@see P_Pq_R
 	 * 	@return RCAC P(1,1) of the Attitude controller
 	 */
-	const float &get_RCAC_P11_Att() { return P_Pq_R(0,0); }
-
+	const float &get_RCAC_P11_Att() { return rcac_att_P0; }
+		//return P_Pq_R(0,0);
 	/**
 	 * 	Set RCAC variables.
 	 * 	@see all RCAC variables
 	 */
 	void init_RCAC_att()
 	{
+		_rcac_att_x = RCAC(rcac_att_P0);
+		_rcac_att_y = RCAC(rcac_att_P0);
+		_rcac_att_z = RCAC(rcac_att_P0);
 		// P_Pq_R = eye<float, 3>() * 0.010;
 		// N1_Pq = eye<float, 3>();
 		// I3 = eye<float, 3>();
-		P_Pq_R.setZero();
-		N1_Pq.setZero();
-		I3.setZero();
-		for (int i = 0; i <= 2; i++) {
-			P_Pq_R(i,i) = 0.01f;
-			P_Pq_R(i,i) = rcac_att_P0;
-			N1_Pq(i,i) = 1.0f;
-			I3(i,i) = 1.0f;
-		}
-		phi_k_Pq_R.setZero();
-		phi_km1_Pq_R.setZero();
-		theta_k_Pq_R.setZero();
-		z_k_Pq_R.setZero();
-		z_km1_Pq_R.setZero();
-		u_k_Pq_R.setZero();
-		u_km1_Pq_R.setZero();
-		Gamma_Pq_R.setZero();
+		// P_Pq_R.setZero();
+		// N1_Pq.setZero();
+		// I3.setZero();
+		// for (int i = 0; i <= 2; i++) {
+		// 	P_Pq_R(i,i) = 0.01f;
+		// 	P_Pq_R(i,i) = rcac_att_P0;
+		// 	N1_Pq(i,i) = 1.0f;
+		// 	I3(i,i) = 1.0f;
+		// }
+		// phi_k_Pq_R.setZero();
+		// phi_km1_Pq_R.setZero();
+		// theta_k_Pq_R.setZero();
+		// z_k_Pq_R.setZero();
+		// z_km1_Pq_R.setZero();
+		// u_k_Pq_R.setZero();
+		// u_km1_Pq_R.setZero();
+		// Gamma_Pq_R.setZero();
 	}
 
 	/**
