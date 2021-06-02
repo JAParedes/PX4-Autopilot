@@ -91,10 +91,10 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 
 	// calculate angular rates setpoint
 	matrix::Vector3f rate_setpoint = eq.emult(_proportional_gain);
-	
+
 	//// rate_setpoint = alpha_PID*rate_setpoint;
 	//// rate_setpoint = alpha_PID_att*rate_setpoint;
-	
+
 	//this->z_k_Pq_R.setZero();
 	z_k_Pq_R = rate_setpoint;
 	u_k_Pq_R.setZero();
@@ -105,6 +105,14 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 
 	if ((RCAC_Aq_ON) && (!landed))
 	{
+		// u_k_Pr_R(0, 0) = _rcac_pos_x.compute_uk(-pos_error_(0), 0, 0, _rcac_pos_x.get_rcac_uk());
+		// u_k_Pr_R(1, 0) = _rcac_pos_y.compute_uk(-pos_error_(1), 0, 0, _rcac_pos_y.get_rcac_uk());
+		// u_k_Pr_R(2, 0) = _rcac_pos_z.compute_uk(-pos_error_(2), 0, 0, _rcac_pos_z.get_rcac_uk());
+		// u_k_Pq_R(0) = _rcac_pos_x.compute_uk(-pos_error_(0), 0, 0, _rcac_pos_x.get_rcac_uk());
+		// u_k_Pq_R(1) = _rcac_pos_x.compute_uk(-pos_error_(0), 0, 0, _rcac_pos_x.get_rcac_uk());
+		// u_k_Pq_R(2) = _rcac_pos_x.compute_uk(-pos_error_(0), 0, 0, _rcac_pos_x.get_rcac_uk());
+
+
 		ii_Pq_R = ii_Pq_R + 1;
 		if (ii_Pq_R == 1)
 		{
@@ -133,9 +141,11 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 		phi_km1_Pq_R 	= phi_k_Pq_R;
 	}
 	//rate_setpoint 	= alpha_PID * rate_setpoint + u_k_Pq_R;
+
+
 	rate_setpoint 	= alpha_PID_att * rate_setpoint + u_k_Pq_R;
 
-	
+
 
 	// Feed forward the yaw setpoint rate.
 	// yawspeed_setpoint is the feed forward commanded rotation around the world z-axis,
