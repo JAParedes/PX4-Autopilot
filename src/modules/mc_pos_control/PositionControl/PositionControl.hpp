@@ -139,7 +139,7 @@ public:
 	 * Note: NAN value means no feed forward/leave state uncontrolled if there's no higher order setpoint.
 	 * @param setpoint a vehicle_local_position_setpoint_s structure
 	 */
-	void setInputSetpoint(const vehicle_local_position_setpoint_s &setpoint);
+	void setInputSetpoint(vehicle_local_position_setpoint_s setpoint);
 
 	/**
 	 * Pass constraints that are stricter than the global limits
@@ -194,6 +194,7 @@ public:
 	 * 	@return The u variable computed by RCAC in the P controller
 	 */
 	const matrix::Vector3f get_RCAC_pos_u();
+
 	/**
 	 * 	Get the
 	 * 	@see theta_k_Pr_R
@@ -300,21 +301,31 @@ public:
 	 * 	@see P_Pr_R
 	 * 	@return RCAC P(1,1) of the Position controller
 	 */
-	const float &get_RCAC_P11_Pos() { return P_Pr_R(0,0); }
+	float get_RCAC_P11_Pos() { return _rcac_r(0,0).get_rcac_P(0,0); }
 
 	/**
 	 * 	Get the
 	 * 	@see P_vel_x
 	 * 	@return RCAC P(1,1) of the Velcity x controller
 	 */
-	const float &get_RCAC_P11_Velx() { return P_vel_x(0,0); }
+	float get_RCAC_P11_Velx() { return _rcac_v(0,0).get_rcac_P(0,0); }
+
+	/**
+	 * 	Set P0 from value specified in mc_pos_control_params.c
+	 *
+	 */
+	void set_RCAC_r_v_P0(float r_P0, float v_P0)
+	{
+		p0_r = r_P0;
+		p0_v = v_P0;
+	}
 
 	/**
 	 * 	Reset RCAC variables
 	 * 	@see _thr_int
 	 */
-	void resetRCAC(float rcac_pos_p0, float rcac_vel_p0);
-	void init_RCAC(float rcac_pos_p0, float rcac_vel_p0);
+	void resetRCAC();
+	void init_RCAC();
 
 private:
 	bool _updateSuccessful();
@@ -356,32 +367,35 @@ private:
 	float _yaw_sp{}; /**< desired heading */
 	float _yawspeed_sp{}; /** desired yaw-speed */
 
-	// New RCAC_Class_Variables
-	RCAC _rcac_pos_x;
-	RCAC _rcac_pos_y;
-	RCAC _rcac_pos_z;
-	RCAC _rcac_vel_x;
-	RCAC _rcac_vel_y;
-	RCAC _rcac_vel_z;
-	// std::vector<RCAC> _rcac_pos;
-	// std::vector<RCAC> _rcac_vel;
-	//RCAC vel_RCAC;
-
-	// RCAC
+	// RCAC -- Position Controller
+	matrix::Matrix<RCAC, 1, 3> _rcac_r;
+	matrix::Vector3f z_k_r, z_km1_r, u_k_r, u_km1_r;
+	float p0_r = 0.005f;
 	int ii_Pr_R = 0;
-	bool RCAC_Pr_ON=1;
-	matrix::SquareMatrix<float, 3> P_Pr_R;
-	matrix::Matrix<float, 3,3> phi_k_Pr_R, phi_km1_Pr_R;
-	matrix::Matrix<float, 3,1> theta_k_Pr_R;
-  	matrix::Matrix<float, 3,1> z_k_Pr_R, z_km1_Pr_R,u_k_Pr_R, u_km1_Pr_R;
-	matrix::SquareMatrix<float, 3> Gamma_Pr_R;
+	bool RCAC_Pr_ON = 1;
 
-	// const TODO: make really const.
-	matrix::SquareMatrix<float, 3> I3, N1_Pr;
-
+	// RCAC -- Velocity Controller
+	matrix::Matrix<RCAC, 1, 3> _rcac_v;
+	matrix::Vector3f z_k_v, z_km1_v, u_k_v, u_km1_v, Pv_intg;
+	float p0_v = 0.001f;
 	int ii_Pv_R = 0;
 	bool RCAC_Pv_ON=1;
+
+	// RCAC -- misc
+	matrix::SquareMatrix<float, 3> I3, N1_Pr;
+
+	// matrix::Matrix<bool, 1, 3> islanded; /**< (0,1,2) = (isnan(_pos_sp(x,y,z)),isnan(_vel_sp(x,y,z))) */
+	int since_takeoff;
+	bool islanded = true;
 	bool _rcac_logging = true; /**< True if logging the aircraft state variable */ //TODO: MAV integration
+	float alpha_PID_pos = 1.0f;
+	float alpha_PID_vel = 1.0f;
+
+	// matrix::SquareMatrix<float, 3> P_Pr_R;
+	// matrix::Matrix<float, 3,3> phi_k_Pr_R, phi_km1_Pr_R;
+	// matrix::Matrix<float, 3,1> theta_k_Pr_R;
+  	// matrix::Matrix<float, 3,1> z_k_Pr_R, z_km1_Pr_R,u_k_Pr_R, u_km1_Pr_R;
+	// matrix::SquareMatrix<float, 3> Gamma_Pr_R;
 
 	// matrix::SquareMatrix<float, 9> P_Pv_R;
 	// matrix::Matrix<float, 3,9> phi_k_Pv_R, phi_km1_Pv_R;
@@ -389,18 +403,26 @@ private:
   	// matrix::Matrix<float, 3,1> z_k_Pv_R, z_km1_Pv_R,u_k_Pv_R, u_km1_Pv_R;
 	// matrix::SquareMatrix<float, 3> Gamma_Pv_R, N1_Pv;
 
-	matrix::SquareMatrix<float, 3> P_vel_x,P_vel_y,P_vel_z;
-	matrix::Matrix<float, 1,3> phi_k_vel_x, phi_km1_vel_x;
-	matrix::Matrix<float, 1,3> phi_k_vel_y, phi_km1_vel_y;
-	matrix::Matrix<float, 1,3> phi_k_vel_z, phi_km1_vel_z;
-	matrix::Vector3f theta_k_vel_x, theta_k_vel_y, theta_k_vel_z;
-  	matrix::Vector3f z_k_vel, z_km1_vel, u_k_vel, u_km1_vel;
-	matrix::Vector3f N1_vel, Gamma_vel;
-	matrix::Matrix<float, 1,1> dummy1,dummy2,dummy3;
+	// matrix::SquareMatrix<float, 3> P_vel_x,P_vel_y,P_vel_z;
+	// matrix::Matrix<float, 1,3> phi_k_vel_x, phi_km1_vel_x;
+	// matrix::Matrix<float, 1,3> phi_k_vel_y, phi_km1_vel_y;
+	// matrix::Matrix<float, 1,3> phi_k_vel_z, phi_km1_vel_z;
+	// matrix::Vector3f theta_k_vel_x, theta_k_vel_y, theta_k_vel_z;
+  	// matrix::Vector3f z_k_vel, z_km1_vel, u_k_vel, u_km1_vel;
+	// matrix::Vector3f N1_vel, Gamma_vel;
+	// matrix::Matrix<float, 1,1> dummy1,dummy2,dummy3;
 
 	//float alpha_PID = 1.0f;
-	float alpha_PID_pos = 1.0f;
-	float alpha_PID_vel = 1.0f;
 
-	matrix::Vector3f Pv_intg;
+	// New RCAC_Class_Variables
+	// RCAC _rcac_pos_x;
+	// RCAC _rcac_pos_y;
+	// RCAC _rcac_pos_z;
+	// RCAC _rcac_vel_x;
+	// RCAC _rcac_vel_y;
+	// RCAC _rcac_vel_z;
+	// std::vector<RCAC> _rcac_pos;
+	// std::vector<RCAC> _rcac_vel;
+	//RCAC vel_RCAC;
+
 };
