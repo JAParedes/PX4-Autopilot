@@ -183,6 +183,7 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 		// u_km1_Pq_R 	= u_k_Pq_R;
 		// phi_km1_Pq_R 	= phi_k_Pq_R;
 	// }
+
 	//rate_setpoint 	= alpha_PID * rate_setpoint + u_k_Pq_R;
 
 
