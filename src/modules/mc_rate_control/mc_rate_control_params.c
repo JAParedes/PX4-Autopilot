@@ -416,7 +416,7 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_SW, -1.0f);
  * @max 10
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_RATE_ALPHA, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_RATE_ALPHA, 0.3f);
 
 /**
  * P0 for the Rate controller

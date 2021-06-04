@@ -821,7 +821,7 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_SW, -1.0f);
  * @max 10
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_POS_ALPHA, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_POS_ALPHA, 0.3f);
 
 /**
  * PID Velocity gain.
@@ -832,7 +832,7 @@ PARAM_DEFINE_FLOAT(MPC_POS_ALPHA, 1.0f);
  * @max 10
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_VEL_ALPHA, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_VEL_ALPHA, 0.3f);
 
 /**
  * P0 for the position controller

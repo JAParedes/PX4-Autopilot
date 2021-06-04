@@ -288,7 +288,7 @@ void MulticopterPositionControl::Run()
 		}
 		float PID_scale_f = _rc_channels_switch.channels[13];
 		// SITL 2
-		PID_scale_f = 1.0f;
+		PID_scale_f = -1.0f;
 		_control.set_PID_pv_factor(PID_scale_f, _param_mpc_pos_alpha.get(), _param_mpc_vel_alpha.get());
 
 		parameters_update(false);

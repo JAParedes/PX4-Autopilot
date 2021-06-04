@@ -86,9 +86,9 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 			// matrix::Vector3f d_z_k_rate = z_k_rate - z_km1_rate;
 
 			// TODO: Sign of the integral term is unclear.
-			u_k_rate(0) = _rcac_rate_x.compute_uk(0 * -z_k_rate(0), _rate_int(0), 0 * angular_accel(0), u_km1_rate(0));
-			u_k_rate(1) = _rcac_rate_y.compute_uk(0 * -z_k_rate(1), _rate_int(1), 0 * angular_accel(1), u_km1_rate(1));
-			u_k_rate(2) = _rcac_rate_z.compute_uk(0 * -z_k_rate(2), _rate_int(2), 0 * angular_accel(2), u_km1_rate(2));
+			u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), _rate_int(0), 0 * angular_accel(0), u_km1_rate(0));
+			u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), _rate_int(1), 0 * angular_accel(1), u_km1_rate(1));
+			u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), _rate_int(2), 0 * angular_accel(2), u_km1_rate(2));
 			// u_k_rate(0) = _rcac_rate_x.compute_uk(-z_k_rate(0), _rate_int(0), angular_accel(0), _rcac_rate_x.get_rcac_uk());
 			// u_k_rate(1) = _rcac_rate_y.compute_uk(-z_k_rate(1), _rate_int(1), angular_accel(1), _rcac_rate_y.get_rcac_uk());
 			// u_k_rate(2) = _rcac_rate_z.compute_uk(-z_k_rate(2), _rate_int(2), angular_accel(2), _rcac_rate_z.get_rcac_uk());
