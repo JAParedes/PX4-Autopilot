@@ -142,9 +142,10 @@ public:
 		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
 		// RCAC_theta(0) = _rcac_att_x.get_rcac_theta();
 
-		for (int i = 0; i <= 2; i++) {
-			RCAC_theta(i) = _rcac_att_x.get_rcac_theta(i);//theta_k_Pq_R(i);
-		}
+		RCAC_theta(0) = _rcac_att_x.get_rcac_theta(0);//theta_k_Pq_R(i);
+		RCAC_theta(1) = _rcac_att_y.get_rcac_theta(0);//theta_k_Pq_R(i);
+		RCAC_theta(2) = _rcac_att_z.get_rcac_theta(0);//theta_k_Pq_R(i);
+
 
 		return RCAC_theta;
 	}
@@ -192,7 +193,7 @@ public:
 	 */
 	void set_RCAC_att_switch(float switch_RCAC)
 	{
-		RCAC_Aq_ON = 1;
+		// RCAC_Aq_ON = 1;
 		if (switch_RCAC<0.0f) {
 			RCAC_Aq_ON = 0;
 		}
@@ -205,7 +206,7 @@ public:
 	void set_PID_att_factor(float PID_factor, float PID_val)
 	{
 		//alpha_PID = 1;
-		alpha_PID_att = 1.0f;
+		// alpha_PID_att = 1.0f;
 		if (PID_factor<0.0f) {
 			//alpha_PID = 0.5;
 			alpha_PID_att = PID_val;
@@ -269,7 +270,10 @@ private:
 	float _yawspeed_setpoint{0.f}; ///< latest known yawspeed feed-forward setpoint
 
 	int ii_Pq_R = 0;
-  	bool RCAC_Aq_ON=1;
+  	bool RCAC_Aq_ON = 0;
+	float alpha_PID_att = 0.3f;
+	float rcac_att_P0 = 0.001f;
+
 	matrix::SquareMatrix<float, 3> P_Pq_R;
 	matrix::Matrix<float, 3,3> phi_k_Pq_R, phi_km1_Pq_R;
 	//matrix::Matrix<float, 3,1> theta_k_Pq_R,theta_k_Pq_PID;
@@ -278,13 +282,11 @@ private:
   	matrix::Vector3f z_k_Pq_R, z_km1_Pq_R,u_k_Pq_R, u_km1_Pq_R;
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
 
-	// // New RCAC_Class_Variables
-	// RCAC _rcac_att_x;
-	// RCAC _rcac_att_y;
-	// RCAC _rcac_att_z;
+	// New RCAC_Class_Variables
+	RCAC _rcac_att_x;
+	RCAC _rcac_att_y;
+	RCAC _rcac_att_z;
 
 	//float alpha_PID = 1.0f;
-	float alpha_PID_att = 1.0f;
-	float rcac_att_P0 = 0.011f;
 
 };

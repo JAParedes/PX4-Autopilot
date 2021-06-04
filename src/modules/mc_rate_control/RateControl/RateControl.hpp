@@ -143,9 +143,9 @@ public:
 
 		for (int i = 0; i <= 3; i++) {
 			// RCAC_theta(i,0) = theta_k_AC_R(i,0);
-			RCAC_theta(i,0) = theta_k_rate_x(i,0);
-			RCAC_theta(i+4,0) = theta_k_rate_y(i,0);
-			RCAC_theta(i+8,0) = theta_k_rate_z(i,0);
+			RCAC_theta(i,0) = _rcac_rate_x.get_rcac_theta(i);
+			RCAC_theta(i+4,0) = _rcac_rate_y.get_rcac_theta(i);
+			RCAC_theta(i+8,0) = _rcac_rate_z.get_rcac_theta(i);
 		}
 
 		return RCAC_theta;
@@ -204,7 +204,7 @@ public:
 	 */
 	void set_RCAC_rate_switch(float switch_RCAC)
 	{
-		RCAC_Aw_ON = 1;
+		// RCAC_Aw_ON = 1;
 		if (switch_RCAC<0.0f) {
 			RCAC_Aw_ON = 0;
 		}
@@ -217,7 +217,7 @@ public:
 	void set_PID_rate_factor(float PID_factor, float PID_val)
 	{
 		//alpha_PID = 1;
-		alpha_PID_rate = 1.0f;
+		// alpha_PID_rate = 1.0f;
 		if (PID_factor<0.0f) {
 			//alpha_PID = 0.5;
 			alpha_PID_rate = PID_val;
@@ -295,7 +295,9 @@ private:
 	bool _mixer_saturation_negative[3] {};
 
 	int ii_AC_R = 0;
-  	bool RCAC_Aw_ON=1;
+  	bool RCAC_Aw_ON = 0;
+	float alpha_PID_rate = 1.0f;
+	float rcac_rate_P0 = 0.0001f;
 	// matrix::SquareMatrix<float, 12> P_AC_R;
 	// matrix::Matrix<float, 3,12> phi_k_AC_R, phi_km1_AC_R;
 	// matrix::Matrix<float, 12,1> theta_k_AC_R,theta_k_Ac_PID;
@@ -317,6 +319,5 @@ private:
 	matrix::Matrix<float, 1,1> dummy1,dummy2,dummy3;
 
 	//float alpha_PID = 1.0f;
-	float alpha_PID_rate = 1.0f;
-	float rcac_rate_P0 = 0.0011f;
+
 };

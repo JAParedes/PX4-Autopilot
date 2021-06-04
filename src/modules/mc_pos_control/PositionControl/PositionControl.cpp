@@ -145,10 +145,11 @@ void PositionControl::_positionControl()
 
 	for (int i = 0; i <=2; i++)
 	{
-		if (isnan(_pos_sp(i)) && isnan(_vel_sp(i)))
+		if (isnan(_pos_sp(i)) || isnan(_vel_sp(i)))
 		{
 			islanded = true;
 			since_takeoff = 0;
+			resetRCAC();
 			break;
 		}
 		else
@@ -512,7 +513,7 @@ const matrix::Matrix<float, 9,1> PositionControl::get_RCAC_vel_theta()
 
 void PositionControl::set_RCAC_pos_switch(float switch_RCAC)
 {
-	RCAC_Pr_ON = 1;
+	// RCAC_Pr_ON = 1;
 	if (switch_RCAC<0.0f) {
 		RCAC_Pr_ON = 0;
 	}
@@ -520,7 +521,7 @@ void PositionControl::set_RCAC_pos_switch(float switch_RCAC)
 
 void PositionControl::set_RCAC_vel_switch(float switch_RCAC)
 {
-	RCAC_Pv_ON = 1;
+	// RCAC_Pv_ON = 1;
 	if (switch_RCAC<0.0f) {
 		RCAC_Pv_ON = 0;
 	}
@@ -528,8 +529,8 @@ void PositionControl::set_RCAC_vel_switch(float switch_RCAC)
 
 void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float vel_alpha)
 {
-	alpha_PID_pos = 1.0f;
-	alpha_PID_vel = 1.0f;
+	// alpha_PID_pos = 1.0f;
+	// alpha_PID_vel = 1.0f;
 	//alpha_PID = 1.0f;
 
 	if (PID_factor<0.0f) {
