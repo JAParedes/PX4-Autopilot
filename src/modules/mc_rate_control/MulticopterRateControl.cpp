@@ -95,9 +95,9 @@ MulticopterRateControl::parameters_updated()
 
 	_actuators_0_circuit_breaker_enabled = circuit_breaker_enabled_by_val(_param_cbrk_rate_ctrl.get(), CBRK_RATE_CTRL_KEY);
 
-	
+
 	//Set P0 for RCAC attitude and Rate controller
-	
+
 	_rate_control.set_RCAC_rate_P0(_param_mpc_rcac_rate_P0.get());
 	_rate_control.init_RCAC_rate();
 	PX4_INFO("Rate Control P0:\t%8.6f", (double)_param_mpc_rcac_rate_P0.get());
@@ -175,7 +175,7 @@ MulticopterRateControl::Run()
 		float PID_scale_f = _rc_channels_switch.channels[13];
 		// SITL
 		RCAC_switch = 1.0f;
-		PID_scale_f = 1.0f;
+		PID_scale_f = -1.0f;
 		if (RCAC_switch>0.0f)
 		{
 			_rate_control.set_RCAC_rate_switch(_param_mpc_rcac_rate_sw.get());
