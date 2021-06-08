@@ -309,7 +309,7 @@ const matrix::Vector3f PositionControl::get_RCAC_pos_z()
 	return RCAC_z;
 }
 
-const matrix::Vector3f PositionControl::get_RCAC_pos_u()
+matrix::Vector3f PositionControl::get_RCAC_pos_u()
 {
 	matrix::Vector3f RCAC_u{};
 
@@ -401,20 +401,19 @@ const matrix::Matrix<float, 9,1> PositionControl::get_RCAC_vel_theta()
 
 void PositionControl::set_RCAC_pos_switch(float switch_RCAC)
 {
-	if (switch_RCAC<0.0f) {
-		RCAC_Pr_ON = 0;
-	}
+	if (switch_RCAC <= 0.0f) {RCAC_Pr_ON = 0;}
+	else {RCAC_Pr_ON = 1;}
 }
 
 void PositionControl::set_RCAC_vel_switch(float switch_RCAC)
 {
-	if (switch_RCAC<0.0f) {
-		RCAC_Pv_ON = 0;
-	}
+	if (switch_RCAC <= 0.0f) {RCAC_Pv_ON = 0;}
+	else {RCAC_Pv_ON = 1;}
 }
 
 void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float vel_alpha)
 {
+
 	if (PID_factor<0.0f) {
 		alpha_PID_pos = pos_alpha;
 		alpha_PID_vel = vel_alpha;

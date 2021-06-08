@@ -73,8 +73,7 @@ bool MulticopterPositionControl::init()
 
 	_time_stamp_last_loop = hrt_absolute_time();
 
-	// _control.init_RCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
-	// _control.init_RCAC();
+	_control.set_RCAC_r_v_P0(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
 
 	return true;
 }
@@ -305,15 +304,6 @@ void MulticopterPositionControl::Run()
 
 		vehicle_local_position_setpoint_s setpoint;
 
-		// if (_vehicle_land_detected_sub.updated()) {
-		// 	vehicle_land_detected_s vehicle_land_detected;
-
-		// 	if (_vehicle_land_detected_sub.copy(&vehicle_land_detected)) {
-		// 		_landed = vehicle_land_detected.landed;
-		// 		_maybe_landed = vehicle_land_detected.maybe_landed;
-		// 	}
-		// }
-
 		// check if any task is active
 		if (_trajectory_setpoint_sub.update(&setpoint)) {
 			_control.setInputSetpoint(setpoint);
@@ -330,13 +320,7 @@ void MulticopterPositionControl::Run()
 
 				if (constraints.reset_integral) {
 					_control.resetIntegral();
-					// _control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
-					// _control.resetRCAC();
-					// for (int i = 0; i <= 2; i++)
-					// {
-					// 	_rcac_r(0,i) = RCAC(p0_r);
-					// 	_rcac_v(0,i) = RCAC(p0_v);
-					// }
+					_control.resetRCAC();
 				}
 			}
 

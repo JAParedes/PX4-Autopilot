@@ -193,7 +193,7 @@ public:
 	 * 	@see u_k_Pr_R
 	 * 	@return The u variable computed by RCAC in the P controller
 	 */
-	const matrix::Vector3f get_RCAC_pos_u();
+	matrix::Vector3f get_RCAC_pos_u();
 
 	/**
 	 * 	Get the
@@ -370,17 +370,17 @@ private:
 	matrix::Matrix<RCAC, 1, 3> _rcac_r;
 	matrix::Vector3f z_k_r, z_km1_r, u_k_r, u_km1_r;
 	float p0_r = 0.005f;
-	bool RCAC_Pr_ON = 0;
+	bool RCAC_Pr_ON = 1;
 	float alpha_PID_pos = 1.0f;
 
 	// RCAC -- Velocity Controller
 	matrix::Matrix<RCAC, 1, 3> _rcac_v;
 	matrix::Vector3f z_k_v, z_km1_v, u_k_v, u_km1_v, Pv_intg;
 	float p0_v = 0.001f;
-	bool RCAC_Pv_ON = 0;
+	bool RCAC_Pv_ON = 1;
 	float alpha_PID_vel = 1.0f;
 
 	// RCAC -- misc
-	int since_takeoff;
+	int since_takeoff = 0;
 	bool islanded = true;
 };
