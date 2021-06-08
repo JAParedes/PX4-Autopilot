@@ -241,6 +241,7 @@ public:
 		{
 			_rcac_rate(i) = RCAC(rcac_rate_P0);
 		}
+		resetIntegral();
 	}
 
 	/**
