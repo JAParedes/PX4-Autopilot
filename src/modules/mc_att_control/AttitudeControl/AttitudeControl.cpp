@@ -108,14 +108,15 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 				//Make sure that u_km1_Pq_R is valid.
 				u_km1_Pq_R = u_k_Pq_R;
 			}
-			// PX4_INFO("get_rcac_uk: %1.6f | %1.6f | %1.6f", (double)_rcac_att_x.get_rcac_uk(), (double)_rcac_att_y.get_rcac_uk(), (double)_rcac_att_z.get_rcac_uk());
-			u_k_Pq_R(0) = _rcac_att_x.compute_uk(-z_k_Pq_R(0), 0, 0, u_km1_Pq_R(0));
-			u_k_Pq_R(1) = _rcac_att_y.compute_uk(-z_k_Pq_R(1), 0, 0, u_km1_Pq_R(1));
-			u_k_Pq_R(2) = _rcac_att_z.compute_uk(-z_k_Pq_R(2), 0, 0, u_km1_Pq_R(2));
+
+			for (size_t i = 0; i <= 2; ++i)
+			{
+				u_k_Pq_R(i) = _rcac_att(i).compute_uk(-z_k_Pq_R(i), 0, 0, u_km1_Pq_R(i));
+			}
+			++ii_Pq_R;
 			//PX4_INFO("Hi");
 			// PX4_INFO("z_k_Pq_R: %1.6f | %1.6f | %1.6f", (double)z_k_Pq_R(0), (double)z_k_Pq_R(1), (double)z_k_Pq_R(2));
 			// PX4_INFO("u_Pq_R: %1.6f | %1.6f | %1.6f", (double)u_k_Pq_R(0), (double)u_k_Pq_R(1), (double)u_k_Pq_R(2));
-			++ii_Pq_R;
 		}
 	}
 
@@ -136,74 +137,4 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 
 	return rate_setpoint;
 
-	// if (landed)
-	// {
-	// 	ii_Pq_R = 0;
-	// }
-
-	// if ((RCAC_Aq_ON) && (!landed))
-	// {
-	// 	if (ii_Pq_R == 0)
-	// 		init_RCAC_att();
-
-	// 	// Update Attitude RCAC with Current Iteration Values
-	// 	u_k_Pq_R(0) = _rcac_att_x.compute_uk(-z_k_Pq_R(0), 0, 0, _rcac_att_x.get_rcac_uk());
-	// 	u_k_Pq_R(1) = _rcac_att_y.compute_uk(-z_k_Pq_R(1), 0, 0, _rcac_att_y.get_rcac_uk());
-	// 	u_k_Pq_R(2) = _rcac_att_z.compute_uk(-z_k_Pq_R(2), 0, 0, _rcac_att_z.get_rcac_uk());
-
-	// 	++ii_Pq_R;
-
-
-		// Legacy Code Below
-
-		// ii_Pq_R = ii_Pq_R + 1;
-		// if (ii_Pq_R == 1)
-		// {
-		// 	init_RCAC_att();
-		// 	//P_Pq_R = eye<float, 3>() * _param_mpc_rcac_att_p0.get();
-		// }
-		// for (int i = 0; i <= 2; i++) {
-		// 	phi_k_Pq_R(i, i) = eq(i);
-		// 	theta_k_Pq_PID(i) = _proportional_gain(i); //Ankit: Not needed now, but keep it just in case
-		// }
-
-		// //z_k_Pq_R.setZero();
-		// //z_k_Pq_R += rate_setpoint;
-
-		// Gamma_Pq_R 	= phi_km1_Pq_R * P_Pq_R * phi_km1_Pq_R.T() + I3;
-		// Gamma_Pq_R 	= Gamma_Pq_R.I();
-		// P_Pq_R 		= P_Pq_R - (P_Pq_R * phi_km1_Pq_R.T()) * Gamma_Pq_R * (phi_km1_Pq_R * P_Pq_R);
-		// //theta_k_Pq_R 	= theta_k_Pq_R + (P_Pq_R * phi_km1_Pq_R.T()) *
-		// //		 (z_k_Pq_R + (-1.0f)*(phi_km1_Pq_R * theta_k_Pq_R - u_km1_Pq_R) * (-1.0f));
-		// theta_k_Pq_R 	= theta_k_Pq_R + (P_Pq_R * phi_km1_Pq_R.T()) * N1_Pq *
-		// 		 (z_k_Pq_R + N1_Pq*(phi_km1_Pq_R * theta_k_Pq_R - u_km1_Pq_R) );
-
-		// //u_k_Pq_R 	= phi_k_Pq_R * (theta_k_Pq_R+ 0*a *theta_k_Pq_PID);
-		// u_k_Pq_R 	= phi_k_Pq_R * (theta_k_Pq_R+ 0*alpha_PID_att *theta_k_Pq_PID);
-		// u_km1_Pq_R 	= u_k_Pq_R;
-		// phi_km1_Pq_R 	= phi_k_Pq_R;
-	// }
-
-	//rate_setpoint 	= alpha_PID * rate_setpoint + u_k_Pq_R;
-
-
-	// rate_setpoint 	= alpha_PID_att * rate_setpoint + u_k_Pq_R;
-
-
-
-	// Feed forward the yaw setpoint rate.
-	// yawspeed_setpoint is the feed forward commanded rotation around the world z-axis,
-	// but we need to apply it in the body frame (because _rates_sp is expressed in the body frame).
-	// Therefore we infer the world z-axis (expressed in the body frame) by taking the last column of R.transposed (== q.inversed)
-	// and multiply it by the yaw setpoint rate (yawspeed_setpoint).
-	// This yields a vector representing the commanded rotatation around the world z-axis expressed in the body frame
-	// such that it can be added to the rates setpoint.
-	// rate_setpoint += q.inversed().dcm_z() * _yawspeed_setpoint;
-
-	// // limit rates
-	// for (int i = 0; i < 3; i++) {
-	// 	rate_setpoint(i) = math::constrain(rate_setpoint(i), -_rate_limit(i), _rate_limit(i));
-	// }
-
-	// return rate_setpoint;
 }
