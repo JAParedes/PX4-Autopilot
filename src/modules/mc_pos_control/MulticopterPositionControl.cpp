@@ -331,7 +331,12 @@ void MulticopterPositionControl::Run()
 				if (constraints.reset_integral) {
 					_control.resetIntegral();
 					// _control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
-					_control.resetRCAC();
+					// _control.resetRCAC();
+					// for (int i = 0; i <= 2; i++)
+					// {
+					// 	_rcac_r(0,i) = RCAC(p0_r);
+					// 	_rcac_v(0,i) = RCAC(p0_v);
+					// }
 				}
 			}
 
