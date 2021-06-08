@@ -242,14 +242,14 @@ public:
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC position controller
 	 */
-	const int &get_RCAC_pos_ii() { return ii_Pr_R; }
+	int get_RCAC_pos_ii() { return _rcac_r(0,0).getkk(); }
 
 	/**
 	 * 	Get the
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC velocity controller
 	 */
-	const int &get_RCAC_vel_ii() { return ii_Pv_R; }
+	int get_RCAC_vel_ii() { return _rcac_v(0,0).getkk(); }
 
 	/**
 	 * 	Set the RCAC position switch.
@@ -325,7 +325,7 @@ public:
 	 * 	@see _thr_int
 	 */
 	void resetRCAC();
-	void init_RCAC();
+	// void init_RCAC();
 
 private:
 	bool _updateSuccessful();
@@ -371,7 +371,6 @@ private:
 	matrix::Matrix<RCAC, 1, 3> _rcac_r;
 	matrix::Vector3f z_k_r, z_km1_r, u_k_r, u_km1_r;
 	float p0_r = 0.005f;
-	int ii_Pr_R = 0;
 	bool RCAC_Pr_ON = 0;
 	float alpha_PID_pos = 1.0f;
 
@@ -379,7 +378,6 @@ private:
 	matrix::Matrix<RCAC, 1, 3> _rcac_v;
 	matrix::Vector3f z_k_v, z_km1_v, u_k_v, u_km1_v, Pv_intg;
 	float p0_v = 0.001f;
-	int ii_Pv_R = 0;
 	bool RCAC_Pv_ON = 0;
 	float alpha_PID_vel = 1.0f;
 
@@ -393,6 +391,9 @@ private:
 
 
 
+
+	// int ii_Pr_R = 0;
+	// int ii_Pv_R = 0;
 	// matrix::SquareMatrix<float, 3> P_Pr_R;
 	// matrix::Matrix<float, 3,3> phi_k_Pr_R, phi_km1_Pr_R;
 	// matrix::Matrix<float, 3,1> theta_k_Pr_R;

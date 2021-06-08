@@ -164,7 +164,7 @@ void PositionControl::_positionControl()
 	{
 		if (since_takeoff == 0)
 		{
-			init_RCAC();
+			resetRCAC();
 		}
 
 		for (int i = 0; i <= 2; i++)
@@ -173,7 +173,7 @@ void PositionControl::_positionControl()
 		}
 		u_km1_r = u_k_r;
 
-		ii_Pr_R++;
+		// ii_Pr_R++;
 		since_takeoff++;
 	}
 
@@ -234,7 +234,7 @@ void PositionControl::_velocityControl(const float dt)
 
 	if ((RCAC_Pv_ON) && (!islanded))
 	{
-		ii_Pv_R += 1;
+		// ii_Pv_R += 1;
 		for (int i = 0; i <= 2; i++)
 		{
 			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
@@ -540,76 +540,79 @@ void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float
 
 }
 
-void PositionControl::init_RCAC()
+// void PositionControl::init_RCAC()
+// {
+// 	I3 = eye<float, 3>();
+// 	N1_Pr = eye<float, 3>() * (1.0f);
+
+// 	u_k_r.setZero();
+// 	u_km1_r.setZero();
+// 	z_k_r.setZero();
+// 	z_km1_r.setZero();
+
+// 	u_k_v.setZero();
+// 	u_km1_v.setZero();
+// 	z_k_v.setZero();
+// 	z_km1_v.setZero();
+
+// 	for (int i = 0; i <= 2; i++) {
+// 		_rcac_r(0,i) = RCAC(p0_r);
+// 		_rcac_v(0,i) = RCAC(p0_v);
+// 	}
+
+// 	// for (int i = 0; i <= 2; i++) {
+// 	// 	N1_vel(i) = 1;
+// 	// }
+// 	// P_Pr_R = eye<float, 3>() * 0.010 ;
+
+// 	// phi_k_Pr_R.setZero();			// spjohn -- sub in rcac class
+// 	// phi_km1_Pr_R.setZero();
+// 	// theta_k_Pr_R.setZero();
+// 	// z_k_Pr_R.setZero();
+// 	// z_km1_Pr_R.setZero();
+// 	// u_k_Pr_R.setZero();
+// 	// u_km1_Pr_R.setZero();
+// 	// Gamma_Pr_R.setZero();
+
+// 	// P_vel_x = eye<float, 3>() * 0.0010;
+// 	// P_vel_y = eye<float, 3>() * 0.0010;
+// 	// P_vel_z = eye<float, 3>() * 0.0010;
+// 	// phi_k_vel_x.setZero();
+// 	// phi_k_vel_y.setZero();
+// 	// phi_k_vel_z.setZero();
+// 	// phi_km1_vel_x.setZero();
+// 	// phi_km1_vel_y.setZero();
+// 	// phi_km1_vel_z.setZero();
+// 	// theta_k_vel_x.setZero();
+// 	// theta_k_vel_y.setZero();
+// 	// theta_k_vel_z.setZero();
+// 	// u_k_vel.setZero();
+// 	// z_k_vel.setZero();
+
+// 	// P_Pr_R = eye<float, 3>() * rcac_pos_p0;
+// 	// P_vel_x = eye<float, 3>() * rcac_vel_p0;
+// 	// P_vel_y = eye<float, 3>() * rcac_vel_p0;
+// 	// P_vel_z = eye<float, 3>() * rcac_vel_p0;
+// 	// _rcac_pos_x = RCAC(rcac_pos_p0);
+// 	// _rcac_pos_y = RCAC(rcac_pos_p0);
+// 	// _rcac_pos_z = RCAC(rcac_pos_p0);
+// 	// _rcac_vel_x = RCAC(rcac_vel_p0);
+// 	// _rcac_vel_y = RCAC(rcac_vel_p0);
+// 	// _rcac_vel_z = RCAC(rcac_vel_p0);
+
+
+// 	// P_11_r = rcac_pos_p0;
+// 	// P_11_vx = rcac_vel_p0;
+
+// 	PX4_INFO("Pos Control P0:\t%8.6f", (double)p0_r);
+// 	PX4_INFO("Vel Control P0:\t%8.6f", (double)p0_v);
+// }
+
+void PositionControl::resetRCAC()
 {
 	I3 = eye<float, 3>();
 	N1_Pr = eye<float, 3>() * (1.0f);
 
-	u_k_r.setZero();
-	u_km1_r.setZero();
-	z_k_r.setZero();
-	z_km1_r.setZero();
-
-	u_k_v.setZero();
-	u_km1_v.setZero();
-	z_k_v.setZero();
-	z_km1_v.setZero();
-
-	for (int i = 0; i <= 2; i++) {
-		_rcac_r(0,i) = RCAC(p0_r);
-		_rcac_v(0,i) = RCAC(p0_v);
-	}
-
-	// for (int i = 0; i <= 2; i++) {
-	// 	N1_vel(i) = 1;
-	// }
-	// P_Pr_R = eye<float, 3>() * 0.010 ;
-
-	// phi_k_Pr_R.setZero();			// spjohn -- sub in rcac class
-	// phi_km1_Pr_R.setZero();
-	// theta_k_Pr_R.setZero();
-	// z_k_Pr_R.setZero();
-	// z_km1_Pr_R.setZero();
-	// u_k_Pr_R.setZero();
-	// u_km1_Pr_R.setZero();
-	// Gamma_Pr_R.setZero();
-
-	// P_vel_x = eye<float, 3>() * 0.0010;
-	// P_vel_y = eye<float, 3>() * 0.0010;
-	// P_vel_z = eye<float, 3>() * 0.0010;
-	// phi_k_vel_x.setZero();
-	// phi_k_vel_y.setZero();
-	// phi_k_vel_z.setZero();
-	// phi_km1_vel_x.setZero();
-	// phi_km1_vel_y.setZero();
-	// phi_km1_vel_z.setZero();
-	// theta_k_vel_x.setZero();
-	// theta_k_vel_y.setZero();
-	// theta_k_vel_z.setZero();
-	// u_k_vel.setZero();
-	// z_k_vel.setZero();
-
-	// P_Pr_R = eye<float, 3>() * rcac_pos_p0;
-	// P_vel_x = eye<float, 3>() * rcac_vel_p0;
-	// P_vel_y = eye<float, 3>() * rcac_vel_p0;
-	// P_vel_z = eye<float, 3>() * rcac_vel_p0;
-	// _rcac_pos_x = RCAC(rcac_pos_p0);
-	// _rcac_pos_y = RCAC(rcac_pos_p0);
-	// _rcac_pos_z = RCAC(rcac_pos_p0);
-	// _rcac_vel_x = RCAC(rcac_vel_p0);
-	// _rcac_vel_y = RCAC(rcac_vel_p0);
-	// _rcac_vel_z = RCAC(rcac_vel_p0);
-
-
-	// P_11_r = rcac_pos_p0;
-	// P_11_vx = rcac_vel_p0;
-
-	PX4_INFO("Pos Control P0:\t%8.6f", (double)p0_r);
-	PX4_INFO("Vel Control P0:\t%8.6f", (double)p0_v);
-}
-
-void PositionControl::resetRCAC()
-{
 	u_k_r.setZero();
 	u_km1_r.setZero();
 	z_k_r.setZero();
@@ -666,6 +669,6 @@ void PositionControl::resetRCAC()
 	// P_11_r = rcac_pos_p0;
 	// P_11_vx = rcac_vel_p0;
 
-	ii_Pr_R = 0;
-	ii_Pv_R = 0;
+	// ii_Pr_R = 0;
+	// ii_Pv_R = 0;
 }
