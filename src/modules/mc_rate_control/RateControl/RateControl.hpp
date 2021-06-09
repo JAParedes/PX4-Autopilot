@@ -127,8 +127,8 @@ public:
 		matrix::Vector3f RCAC_u{};
 
 		for (int i = 0; i <= 2; i++) {
-			RCAC_u(i) = u_k_rate(i);
-			// RCAC_u(i) = _rcac_rate(i).get_rcac_uk();
+			// RCAC_u(i) = u_k_rate(i);
+			RCAC_u(i) = _rcac_rate(i).get_rcac_uk();
 		}
 
 		return RCAC_u;
@@ -241,7 +241,8 @@ public:
 	{
 		for (size_t i = 0; i <= 2; ++i)
 		{
-			_rcac_rate(i) = RCAC(rcac_rate_P0);
+			// Jun 9th 2021: Asked to flip the sign of the filter coef.
+			_rcac_rate(i) = RCAC(rcac_rate_P0, 1.0, -1.0);
 		}
 		resetIntegral();
 	}

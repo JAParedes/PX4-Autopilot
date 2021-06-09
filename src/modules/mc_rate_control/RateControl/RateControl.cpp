@@ -87,7 +87,7 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 			// Addition of a further rcac class with 3 vec and landing tracker will remove a lot of the logic here
 			for (size_t i = 0; i <= 2; ++i)
 			{
-				u_k_rate(i) = _rcac_rate(i).compute_uk(-z_k_rate(i), _rate_int(i), 0 * angular_accel(i), u_km1_rate(i));
+				u_k_rate(i) = _rcac_rate(i).compute_uk(z_k_rate(i), _rate_int(i), 0 * angular_accel(i), u_km1_rate(i));
 			}
 			++ii_AC_R;
 		}
