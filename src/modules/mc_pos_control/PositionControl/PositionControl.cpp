@@ -347,13 +347,13 @@ const matrix::Vector3f PositionControl::get_PX4_pos_theta()
 const matrix::Matrix<float, 9,1> PositionControl::get_PX4_ol_theta()
 {
 	matrix::Matrix<float, 9,1> PX4_theta{};
-	PX4_theta(0,0) = _gain_vel_p(0);
-	PX4_theta(1,0) = _gain_vel_i(0);
-	PX4_theta(2,0) = _gain_vel_d(0);
+	PX4_theta(0,0) = _gain_pos_p(0);
+	PX4_theta(1,0) = _gain_pos_p(1);
+	PX4_theta(2,0) = _gain_pos_p(2);
 
-	PX4_theta(3,0) = _gain_vel_p(1);
-	PX4_theta(4,0) = _gain_vel_i(1);
-	PX4_theta(5,0) = _gain_vel_d(1);
+	PX4_theta(3,0) = _gain_vel_p(0);
+	PX4_theta(4,0) = _gain_vel_i(0);
+	PX4_theta(5,0) = _gain_vel_d(0);
 
 	PX4_theta(6,0) = _gain_vel_p(2);
 	PX4_theta(7,0) = _gain_vel_i(2);
