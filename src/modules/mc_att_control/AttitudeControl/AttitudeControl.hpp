@@ -104,7 +104,8 @@ public:
 		matrix::Vector3f RCAC_z{};
 
 		for (int i = 0; i <= 2; i++) {
-			RCAC_z(i) = _rcac_att(i).get_rcac_zk();
+			RCAC_z(i) = z_k_Pq_R(i);
+			// RCAC_z(i) = _rcac_att(i).get_rcac_zk();
 		}
 
 		return RCAC_z;
@@ -120,6 +121,7 @@ public:
 		matrix::Vector3f RCAC_u{};
 
 		for (int i = 0; i <= 2; i++) {
+			// RCAC_u(i) = u_k_Pq_R(i);
 			RCAC_u(i) = _rcac_att(i).get_rcac_uk();
 		}
 

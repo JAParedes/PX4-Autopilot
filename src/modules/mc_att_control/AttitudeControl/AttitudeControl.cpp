@@ -96,7 +96,7 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 	//// rate_setpoint = alpha_PID_att*rate_setpoint;
 
 	//this->z_k_Pq_R.setZero();
-	z_k_Pq_R = rate_setpoint;
+	z_k_Pq_R = eq;
 	u_k_Pq_R.setZero();
 
 	if (!landed)
