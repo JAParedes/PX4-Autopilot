@@ -157,7 +157,7 @@ void PositionControl::_positionControl()
 
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_r(i) = _rcac_r(0,i).compute_uk(z_k_r(i), 0, 0, u_km1_r(i));
+			u_k_r(i) = _rcac_r(0,i).compute_uk(-z_k_r(i), 0, 0, u_km1_r(i));
 		}
 		u_km1_r = u_k_r;
 	}
@@ -189,7 +189,7 @@ void PositionControl::_velocityControl(const float dt)
 	{
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
+			u_k_v(i) = _rcac_v(0,i).compute_uk(-z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
 		}
 		u_km1_v = u_k_v;
 	}
@@ -303,7 +303,7 @@ const matrix::Vector3f PositionControl::get_RCAC_pos_z()
 	matrix::Vector3f RCAC_z{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_z(i) = _rcac_r(0,i).get_rcac_zk();
+		RCAC_z(i) = z_k_r(i);
 	}
 
 	return RCAC_z;
@@ -367,7 +367,7 @@ const matrix::Vector3f PositionControl::get_RCAC_vel_z()
 	matrix::Vector3f RCAC_z{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_z(i) = _rcac_v(0,i).get_rcac_zk();
+		RCAC_z(i) = z_k_v(i);
 	}
 
 	return RCAC_z;
