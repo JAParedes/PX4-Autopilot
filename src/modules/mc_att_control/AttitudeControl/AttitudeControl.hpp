@@ -223,7 +223,7 @@ public:
 	{
 		for (size_t i = 0; i <= 2; ++i)
 		{
-			_rcac_att(i) = RCAC(rcac_att_P0, 1.0, -1.0); // RCAC(rcac_att_P0);
+			_rcac_att(i) = RCAC(rcac_att_P0, 1.0, -1.0);//RCAC(rcac_att_P0);
 		}
 	}
 

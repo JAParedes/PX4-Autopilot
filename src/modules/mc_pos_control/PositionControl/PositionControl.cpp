@@ -157,7 +157,7 @@ void PositionControl::_positionControl()
 
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_r(i) = _rcac_r(0,i).compute_uk(-z_k_r(i), 0, 0, u_km1_r(i));
+			u_k_r(i) = _rcac_r(0,i).compute_uk(z_k_r(i), 0, 0, u_km1_r(i));
 		}
 		u_km1_r = u_k_r;
 	}
@@ -189,7 +189,7 @@ void PositionControl::_velocityControl(const float dt)
 	{
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_v(i) = _rcac_v(0,i).compute_uk(-z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
+			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
 		}
 		u_km1_v = u_k_v;
 	}
@@ -347,13 +347,13 @@ const matrix::Vector3f PositionControl::get_PX4_pos_theta()
 const matrix::Matrix<float, 9,1> PositionControl::get_PX4_ol_theta()
 {
 	matrix::Matrix<float, 9,1> PX4_theta{};
-	PX4_theta(0,0) = _gain_vel_p(0);
-	PX4_theta(1,0) = _gain_vel_i(0);
-	PX4_theta(2,0) = _gain_vel_d(0);
+	PX4_theta(0,0) = _gain_pos_p(0);
+	PX4_theta(1,0) = _gain_pos_p(1);
+	PX4_theta(2,0) = _gain_pos_p(2);
 
-	PX4_theta(3,0) = _gain_vel_p(1);
-	PX4_theta(4,0) = _gain_vel_i(1);
-	PX4_theta(5,0) = _gain_vel_d(1);
+	PX4_theta(3,0) = _gain_vel_p(0);
+	PX4_theta(4,0) = _gain_vel_i(0);
+	PX4_theta(5,0) = _gain_vel_d(0);
 
 	PX4_theta(6,0) = _gain_vel_p(2);
 	PX4_theta(7,0) = _gain_vel_i(2);
@@ -401,19 +401,24 @@ const matrix::Matrix<float, 9,1> PositionControl::get_RCAC_vel_theta()
 
 void PositionControl::set_RCAC_pos_switch(float switch_RCAC)
 {
-	if (switch_RCAC <= 0.0f) {RCAC_Pr_ON = 0;}
-	else {RCAC_Pr_ON = 1;}
+	RCAC_Pr_ON = 1;
+	if (switch_RCAC < 0.0f) {
+		RCAC_Pr_ON = 0;
+	}
 }
 
 void PositionControl::set_RCAC_vel_switch(float switch_RCAC)
 {
-	if (switch_RCAC <= 0.0f) {RCAC_Pv_ON = 0;}
-	else {RCAC_Pv_ON = 1;}
+	RCAC_Pv_ON = 1;
+	if (switch_RCAC < 0.0f) {
+		RCAC_Pv_ON = 0;
+	}
 }
 
 void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float vel_alpha)
 {
-
+	alpha_PID_pos = 1.0f;
+	alpha_PID_vel = 1.0f;
 	if (PID_factor<0.0f) {
 		alpha_PID_pos = pos_alpha;
 		alpha_PID_vel = vel_alpha;
@@ -423,7 +428,7 @@ void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float
 void PositionControl::resetRCAC()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_r(0,i) = RCAC(p0_r);
-		_rcac_v(0,i) = RCAC(p0_v);
+		_rcac_r(0,i) = RCAC(p0_r, 1.0, -1.0);
+		_rcac_v(0,i) = RCAC(p0_v, 1.0, -1.0);
 	}
 }
