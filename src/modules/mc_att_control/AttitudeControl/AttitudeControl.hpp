@@ -53,6 +53,8 @@
 #include <mathlib/mathlib.h>
 #include <px4_log.h>
 
+#define DIM_RCAC_ATT 1
+
 class AttitudeControl
 {
 public:
@@ -223,7 +225,7 @@ public:
 	{
 		for (size_t i = 0; i <= 2; ++i)
 		{
-			_rcac_att(i) = RCAC(rcac_att_P0, 1.0, -1.0);//RCAC(rcac_att_P0);
+			_rcac_att(i) = RCAC<DIM_RCAC_ATT>(rcac_att_P0, 1.0, -1.0);//RCAC(rcac_att_P0);
 		}
 	}
 
@@ -256,10 +258,9 @@ private:
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
 
 	// New RCAC_Class_Variables
-	matrix::Vector<RCAC, 3> _rcac_att;
+	matrix::Vector<RCAC<1>, 3> _rcac_att;
 
 	//float alpha_PID = 1.0f;
 	float alpha_PID_att = 1.0f;
 	float rcac_att_P0 = 0.011f;
-
 };
