@@ -45,6 +45,8 @@
 #include <lib/mixer/MultirotorMixer/MultirotorMixer.hpp>
 #include <uORB/topics/rate_ctrl_status.h>
 
+#define DIM_RCAC_RATE 3
+
 class RateControl
 {
 public:
@@ -242,7 +244,7 @@ public:
 		for (size_t i = 0; i <= 2; ++i)
 		{
 			// Jun 9th 2021: Asked to flip the sign of the filter coef.
-			_rcac_rate(i) = RCAC(rcac_rate_P0, 1.0, -1.0);
+			_rcac_rate(i) = RCAC<DIM_RCAC_RATE>(rcac_rate_P0, 1.0, -1.0);
 		}
 		resetIntegral();
 	}
@@ -281,7 +283,7 @@ private:
 	// matrix::SquareMatrix<float, 3> Gamma_AC_R, I3, N1_Aw;
 
 	// New RCAC_Class_Variables
-	matrix::Vector<RCAC, 3> _rcac_rate;
+	matrix::Vector<RCAC<DIM_RCAC_RATE>, 3> _rcac_rate;
 
 	matrix::SquareMatrix<float, 4> P_rate_x,P_rate_y,P_rate_z;
 	matrix::Matrix<float, 1,4> phi_k_rate_x, phi_km1_rate_x;

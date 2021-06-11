@@ -157,7 +157,9 @@ void PositionControl::_positionControl()
 
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_r(i) = _rcac_r(0,i).compute_uk(z_k_r(i), 0, 0, u_km1_r(i));
+			matrix::Matrix<float, 1, DIM_RCAC_POS> Phi_pos;
+			Phi_pos(0, 0) = z_k_r(i);
+			u_k_r(i) = _rcac_r(0,i).compute_uk(z_k_r(i), Phi_pos, u_km1_r(i));
 		}
 		u_km1_r = u_k_r;
 	}
@@ -189,7 +191,11 @@ void PositionControl::_velocityControl(const float dt)
 	{
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
+			matrix::Matrix<float, 1, DIM_RCAC_VEL> Phi_vel;
+			Phi_vel(0, 0) = z_k_v(i);
+			Phi_vel(0, 1) = _vel_int(i);
+			Phi_vel(0, 2) = _vel_dot(i);
+			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), Phi_vel, u_km1_v(i));
 		}
 		u_km1_v = u_k_v;
 	}
@@ -428,7 +434,7 @@ void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float
 void PositionControl::resetRCAC()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_r(0,i) = RCAC(p0_r, 1.0, -1.0);
-		_rcac_v(0,i) = RCAC(p0_v, 1.0, -1.0);
+		_rcac_r(0,i) = RCAC<DIM_RCAC_POS>(p0_r, 1.0, -1.0);
+		_rcac_v(0,i) = RCAC<DIM_RCAC_VEL>(p0_v, 1.0, -1.0);
 	}
 }

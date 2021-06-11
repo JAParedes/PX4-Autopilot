@@ -258,7 +258,7 @@ private:
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
 
 	// New RCAC_Class_Variables
-	matrix::Vector<RCAC<1>, 3> _rcac_att;
+	matrix::Vector<RCAC<DIM_RCAC_ATT>, 3> _rcac_att;
 
 	//float alpha_PID = 1.0f;
 	float alpha_PID_att = 1.0f;
