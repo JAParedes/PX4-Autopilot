@@ -160,7 +160,7 @@ public:
 	 * @param dt time in seconds since last iteration
 	 * @return true if update succeeded and output setpoint is executable, false if not
 	 */
-	bool update(const float dt);
+	bool update(const float dt, const bool landed);
 
 	/**
 	 * Set the integral term in xy to 0.
@@ -245,14 +245,14 @@ public:
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC position controller
 	 */
-	int get_RCAC_pos_ii() { return _rcac_r(0,0).getkk(); }
+	int get_RCAC_pos_ii() { return _rcac_pos(0,0).getkk(); }
 
 	/**
 	 * 	Get the
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC velocity controller
 	 */
-	int get_RCAC_vel_ii() { return _rcac_v(0,0).getkk(); }
+	int get_RCAC_vel_ii() { return _rcac_vel(0,0).getkk(); }
 
 	/**
 	 * 	Set the RCAC position switch.
@@ -273,17 +273,17 @@ public:
 	void set_PID_pv_factor(float PID_factor, float pos_alpha, float vel_alpha);
 	/**
 	 * 	Get the
-	 * 	@see RCAC_Pr_ON
+	 * 	@see RCAC_pos_ON
 	 * 	@return Get RCAC pos controller switch
 	 */
-	const bool &get_RCAC_pos_switch() {return RCAC_Pr_ON;}
+	const bool &get_RCAC_pos_switch() {return RCAC_pos_ON;}
 
 	/**
 	 * 	Get the
-	 * 	@see RCAC_Pr_ON
+	 * 	@see RCAC_pos_ON
 	 * 	@return Get RCAC vel controller switch
 	 */
-	const bool &get_RCAC_vel_switch() {return RCAC_Pv_ON;}
+	const bool &get_RCAC_vel_switch() {return RCAC_vel_ON;}
 
 	/**
 	 * 	Get the
@@ -304,36 +304,37 @@ public:
 	 * 	@see P_Pr_R
 	 * 	@return RCAC P(1,1) of the Position controller
 	 */
-	float get_RCAC_P11_Pos() { return _rcac_r(0,0).get_rcac_P(0,0); }
+	float get_RCAC_P11_Pos() { return _rcac_pos(0,0).get_rcac_P(0,0); }
 
 	/**
 	 * 	Get the
 	 * 	@see P_vel_x
 	 * 	@return RCAC P(1,1) of the Velcity x controller
 	 */
-	float get_RCAC_P11_Velx() { return _rcac_v(0,0).get_rcac_P(0,0); }
+	float get_RCAC_P11_Velx() { return _rcac_vel(0,0).get_rcac_P(0,0); }
 
 	/**
 	 * 	Set P0 from value specified in mc_pos_control_params.c
 	 *
 	 */
-	void set_RCAC_r_v_P0(float r_P0, float v_P0)
+	void set_RCAC_pos_vel_P0(float r_P0, float v_P0)
 	{
-		p0_r = r_P0;
-		p0_v = v_P0;
+		rcac_pos_P0 = r_P0;
+		rcac_vel_P0 = v_P0;
 	}
 
 	/**
 	 * 	Reset RCAC variables
 	 * 	@see _thr_int
 	 */
-	void resetRCAC();
+	void init_RCAC_pos();
+	void init_RCAC_vel();
 
 private:
 	bool _updateSuccessful();
 
-	void _positionControl(); ///< Position proportional control
-	void _velocityControl(const float dt); ///< Velocity PID control
+	void _positionControl(const bool landed); ///< Position proportional control
+	void _velocityControl(const float dt, const bool landed); ///< Velocity PID control
 	void _accelerationControl(); ///< Acceleration setpoint processing
 
 	// Gains
@@ -370,17 +371,17 @@ private:
 	float _yawspeed_sp{}; /** desired yaw-speed */
 
 	// RCAC -- Position Controller
-	matrix::Matrix<RCAC<DIM_RCAC_POS>, 1, 3> _rcac_r;
-	matrix::Vector3f z_k_r, z_km1_r, u_k_r, u_km1_r;
-	float p0_r = 0.005f;
-	bool RCAC_Pr_ON = 1;
+	matrix::Matrix<RCAC<DIM_RCAC_POS>, 1, 3> _rcac_pos;
+	matrix::Vector3f z_k_pos, u_k_pos, u_km1_pos;
+	float rcac_pos_P0 = 0.005f;
+	bool RCAC_pos_ON = 1;
 	float alpha_PID_pos = 1.0f;
 
 	// RCAC -- Velocity Controller
-	matrix::Matrix<RCAC<DIM_RCAC_VEL>, 1, 3> _rcac_v;
-	matrix::Vector3f z_k_v, z_km1_v, u_k_v, u_km1_v, Pv_intg;
-	float p0_v = 0.001f;
-	bool RCAC_Pv_ON = 1;
+	matrix::Matrix<RCAC<DIM_RCAC_VEL>, 1, 3> _rcac_vel;
+	matrix::Vector3f z_k_vel, u_k_vel, u_km1_vel, Pv_intg;
+	float rcac_vel_P0 = 0.001f;
+	bool RCAC_vel_ON = 1;
 	float alpha_PID_vel = 1.0f;
 
 	// RCAC -- misc
