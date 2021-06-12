@@ -158,10 +158,12 @@ void PositionControl::_positionControl(const bool landed)
 		}
 
 		for (int i = 0; i <= 2; i++)
-		{
-			matrix::Matrix<float, 1, DIM_RCAC_POS> Phi_pos;
-			Phi_pos(0, 0) = z_k_pos(i);
-			u_k_pos(i) = _rcac_pos(0,i).compute_uk(z_k_pos(i), Phi_pos, u_km1_pos(i));
+		{	if (((i < 2) || ((i == 2) && (_pos_sp(2) < 0))) && (!isnan(_pos_sp(2))))
+			{
+				matrix::Matrix<float, 1, DIM_RCAC_POS> Phi_pos;
+				Phi_pos(0, 0) = z_k_pos(i);
+				u_k_pos(i) = _rcac_pos(0,i).compute_uk(z_k_pos(i), Phi_pos, u_km1_pos(i));
+			}
 		}
 		u_km1_pos = u_k_pos;
 	}
@@ -201,11 +203,14 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 
 		for (int i = 0; i <= 2; i++)
 		{
-			matrix::Matrix<float, 1, DIM_RCAC_VEL> Phi_vel;
-			Phi_vel(0, 0) = z_k_vel(i);
-			Phi_vel(0, 1) = _vel_int(i);
-			Phi_vel(0, 2) = _vel_dot(i);
-			u_k_vel(i) = _rcac_vel(0,i).compute_uk(z_k_vel(i), Phi_vel, u_km1_vel(i));
+			if (((i < 2) || ((i == 2) && (_vel_sp(2) < 0))) && (!isnan(_pos_sp(2))))
+			{
+				matrix::Matrix<float, 1, DIM_RCAC_VEL> Phi_vel;
+				Phi_vel(0, 0) = z_k_vel(i);
+				Phi_vel(0, 1) = _vel_int(i);
+				Phi_vel(0, 2) = _vel_dot(i);
+				u_k_vel(i) = _rcac_vel(0,i).compute_uk(z_k_vel(i), Phi_vel, u_km1_vel(i));
+			}
 		}
 		u_km1_vel = u_k_vel;
 	}
@@ -454,13 +459,13 @@ void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float
 void PositionControl::init_RCAC_pos()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_pos(0,i) = RCAC<DIM_RCAC_POS>(rcac_pos_P0, 1.0, -1.0);
+		_rcac_pos(0,i) = RCAC<DIM_RCAC_POS, RU_RCAC_POS>(rcac_pos_P0, rcac_pos_R[0], rcac_pos_R[1], -1.0);
 	}
 }
 
 void PositionControl::init_RCAC_vel()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_vel(0,i) = RCAC<DIM_RCAC_VEL>(rcac_vel_P0, 1.0, -1.0);
+		_rcac_vel(0,i) = RCAC<DIM_RCAC_VEL, RU_RCAC_VEL>(rcac_vel_P0, rcac_vel_R[0], rcac_vel_R[1], -1.0);
 	}
 }

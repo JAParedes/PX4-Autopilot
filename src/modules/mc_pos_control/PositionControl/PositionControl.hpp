@@ -46,7 +46,10 @@
 #include <uORB/topics/vehicle_local_position_setpoint.h>
 
 #define DIM_RCAC_POS 1
+#define RU_RCAC_POS 2
+
 #define DIM_RCAC_VEL 3
+#define RU_RCAC_VEL 2
 // #include "vector"
 
 struct PositionControlStates {
@@ -371,18 +374,22 @@ private:
 	float _yawspeed_sp{}; /** desired yaw-speed */
 
 	// RCAC -- Position Controller
-	matrix::Matrix<RCAC<DIM_RCAC_POS>, 1, 3> _rcac_pos;
+	matrix::Matrix<RCAC<DIM_RCAC_POS, RU_RCAC_POS>, 1, 3> _rcac_pos;
 	matrix::Vector3f z_k_pos, u_k_pos, u_km1_pos;
 	float rcac_pos_P0 = 0.005f;
+	float rcac_pos_R[2] = {1,1};
 	bool RCAC_pos_ON = 1;
 	float alpha_PID_pos = 1.0f;
 
+
 	// RCAC -- Velocity Controller
-	matrix::Matrix<RCAC<DIM_RCAC_VEL>, 1, 3> _rcac_vel;
+	matrix::Matrix<RCAC<DIM_RCAC_VEL, RU_RCAC_VEL>, 1, 3> _rcac_vel;
 	matrix::Vector3f z_k_vel, u_k_vel, u_km1_vel, Pv_intg;
 	float rcac_vel_P0 = 0.001f;
+	float rcac_vel_R[2] = {1,1};
 	bool RCAC_vel_ON = 1;
 	float alpha_PID_vel = 1.0f;
+
 
 	// RCAC -- misc
 	int since_takeoff = 0;
