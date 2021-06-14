@@ -53,8 +53,8 @@
 #include <mathlib/mathlib.h>
 #include <px4_log.h>
 
-#define DIM_RCAC_ATT 1
-#define RU_RCAC_ATT 2
+#define RCAC_ATT_L_THETA 1
+#define RCAC_ATT_L_RBLOCK 1
 
 class AttitudeControl
 {
@@ -226,7 +226,7 @@ public:
 	{
 		for (size_t i = 0; i <= 2; ++i)
 		{
-			_rcac_att(i) = RCAC<DIM_RCAC_ATT, RU_RCAC_ATT>(rcac_att_P0, rcac_att_R[0], rcac_att_R[1], -1.0);//RCAC(rcac_att_P0);
+			_rcac_att(i) = RCAC<RCAC_ATT_L_THETA, RCAC_ATT_L_RBLOCK>(rcac_att_P0, 1.0, rcac_att_Rblock[0], rcac_att_Rblock[1], -1.0);//RCAC(rcac_att_P0);
 		}
 	}
 
@@ -250,7 +250,7 @@ private:
 
 	int ii_Pq_R = 0;
   	bool RCAC_Aq_ON=1;
-	float rcac_att_R[2] = {1,1};
+
 	matrix::SquareMatrix<float, 3> P_Pq_R;
 	matrix::Matrix<float, 3,3> phi_k_Pq_R, phi_km1_Pq_R;
 	//matrix::Matrix<float, 3,1> theta_k_Pq_R,theta_k_Pq_PID;
@@ -260,9 +260,12 @@ private:
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
 
 	// New RCAC_Class_Variables
-	matrix::Vector<RCAC<DIM_RCAC_ATT, RU_RCAC_ATT>, 3> _rcac_att;
+	matrix::Vector<RCAC<RCAC_ATT_L_THETA, RCAC_ATT_L_RBLOCK>, 3> _rcac_att;
 
 	//float alpha_PID = 1.0f;
 	float alpha_PID_att = 1.0f;
 	float rcac_att_P0 = 0.011f;
+	float rcac_att_Rblock[2] = {1.0,1.0};	// rcac_xxx_R[] = {Rz, Ru}
+	int e_fun_att = 0;
+
 };

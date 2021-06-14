@@ -3,7 +3,7 @@
  *   Copyright (c) 2018 - 2019 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * moication, are permitted provided that the following conditions
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
@@ -45,11 +45,11 @@
 #include <uORB/topics/vehicle_constraints.h>
 #include <uORB/topics/vehicle_local_position_setpoint.h>
 
-#define DIM_RCAC_POS 1
-#define RU_RCAC_POS 2
+#define RCAC_POS_L_THETA 1
+#define RCAC_POS_L_RBLOCK 1
 
-#define DIM_RCAC_VEL 3
-#define RU_RCAC_VEL 2
+#define RCAC_VEL_L_THETA 3
+#define RCAC_VEL_L_RBLOCK 1
 // #include "vector"
 
 struct PositionControlStates {
@@ -374,22 +374,22 @@ private:
 	float _yawspeed_sp{}; /** desired yaw-speed */
 
 	// RCAC -- Position Controller
-	matrix::Matrix<RCAC<DIM_RCAC_POS, RU_RCAC_POS>, 1, 3> _rcac_pos;
+	matrix::Matrix<RCAC<RCAC_POS_L_THETA, RCAC_POS_L_RBLOCK>, 1, 3> _rcac_pos;
 	matrix::Vector3f z_k_pos, u_k_pos, u_km1_pos;
-	float rcac_pos_P0 = 0.005f;
-	float rcac_pos_R[2] = {1,1};
 	bool RCAC_pos_ON = 1;
+	float rcac_pos_P0 = 0.005f;
+	float rcac_pos_Rblock[2] = {1.0, 1.0};	// rcac_xxx_R[] = {Rz, Ru}
 	float alpha_PID_pos = 1.0f;
-
+	int e_fun_pos = 0;
 
 	// RCAC -- Velocity Controller
-	matrix::Matrix<RCAC<DIM_RCAC_VEL, RU_RCAC_VEL>, 1, 3> _rcac_vel;
+	matrix::Matrix<RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>, 1, 3> _rcac_vel;
 	matrix::Vector3f z_k_vel, u_k_vel, u_km1_vel, Pv_intg;
-	float rcac_vel_P0 = 0.001f;
-	float rcac_vel_R[2] = {1,1};
 	bool RCAC_vel_ON = 1;
+	float rcac_vel_P0 = 0.001f;
 	float alpha_PID_vel = 1.0f;
-
+	float rcac_vel_Rblock[2] = {1.0, 1.0};	// rcac_xxx_R[] = {Rz, Ru}
+	int e_fun_vel = 0;
 
 	// RCAC -- misc
 	int since_takeoff = 0;

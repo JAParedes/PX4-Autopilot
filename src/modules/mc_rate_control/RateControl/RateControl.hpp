@@ -45,8 +45,8 @@
 #include <lib/mixer/MultirotorMixer/MultirotorMixer.hpp>
 #include <uORB/topics/rate_ctrl_status.h>
 
-#define DIM_RCAC_RATE 3
-#define RU_RCAC_RATE 2
+#define RCAC_RATE_L_THETA 3
+#define RCAC_RATE_L_RBLOCK 1
 
 class RateControl
 {
@@ -245,7 +245,7 @@ public:
 		for (size_t i = 0; i <= 2; ++i)
 		{
 			// Jun 9th 2021: Asked to flip the sign of the filter coef.
-			_rcac_rate(i) = RCAC<DIM_RCAC_RATE, RU_RCAC_RATE>(rcac_rate_P0, rcac_rate_R[0],rcac_rate_R[1], -1.0);
+			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -1.0);
 		}
 		resetIntegral();
 	}
@@ -277,7 +277,7 @@ private:
 
 	int ii_AC_R = 0;
   	bool RCAC_Aw_ON=1;
-	float rcac_rate_R[2] = {1,1};
+
 	// matrix::SquareMatrix<float, 12> P_AC_R;
 	// matrix::Matrix<float, 3,12> phi_k_AC_R, phi_km1_AC_R;
 	// matrix::Matrix<float, 12,1> theta_k_AC_R,theta_k_Ac_PID;
@@ -285,7 +285,7 @@ private:
 	// matrix::SquareMatrix<float, 3> Gamma_AC_R, I3, N1_Aw;
 
 	// New RCAC_Class_Variables
-	matrix::Vector<RCAC<DIM_RCAC_RATE, RU_RCAC_RATE>, 3> _rcac_rate;
+	matrix::Vector<RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>, 3> _rcac_rate;
 
 	matrix::SquareMatrix<float, 4> P_rate_x,P_rate_y,P_rate_z;
 	matrix::Matrix<float, 1,4> phi_k_rate_x, phi_km1_rate_x;
@@ -299,4 +299,7 @@ private:
 	//float alpha_PID = 1.0f;
 	float alpha_PID_rate = 1.0f;
 	float rcac_rate_P0 = 0.0011f;
+	float rcac_rate_Rblock[2] = {1.0, 1.0};	// rcac_xxx_R[] = {Rz, Ru}
+	int e_fun_rate = 0;
+
 };
