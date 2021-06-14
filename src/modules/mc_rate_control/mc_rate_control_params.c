@@ -405,7 +405,7 @@ PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
  * @max 10
  * @group Multicopter Attitude Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_SW, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_SW, -1.0f);
 
 /**
  * PID Rate gain.
@@ -426,4 +426,4 @@ PARAM_DEFINE_FLOAT(MPC_RATE_ALPHA, 1.0f);
  * @decimal 8
  * @group Multicopter Attitude Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_P0, 0.001f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_P0, 0.000001f);

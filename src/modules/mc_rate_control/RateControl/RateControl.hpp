@@ -110,7 +110,8 @@ public:
 		matrix::Vector3f RCAC_z{};
 
 		for (int i = 0; i <= 2; i++) {
-			RCAC_z(i) = z_k_rate(i); //z_k_AC_R(i,0);
+			RCAC_z(i) = z_k_rate(i);
+			// RCAC_z(i) = _rcac_rate(i).get_rcac_zk(); //z_k_AC_R(i,0);
 		}
 
 		return RCAC_z;
@@ -126,7 +127,8 @@ public:
 		matrix::Vector3f RCAC_u{};
 
 		for (int i = 0; i <= 2; i++) {
-			RCAC_u(i) = u_k_rate(i); //u_k_AC_R(i,0);
+			// RCAC_u(i) = u_k_rate(i);
+			RCAC_u(i) = _rcac_rate(i).get_rcac_uk();
 		}
 
 		return RCAC_u;
@@ -141,11 +143,11 @@ public:
 	{
 		matrix::Matrix<float, 12,1> RCAC_theta{};
 
-		for (int i = 0; i <= 3; i++) {
-			// RCAC_theta(i,0) = theta_k_AC_R(i,0);
-			RCAC_theta(i,0) = theta_k_rate_x(i,0);
-			RCAC_theta(i+4,0) = theta_k_rate_y(i,0);
-			RCAC_theta(i+8,0) = theta_k_rate_z(i,0);
+		for (size_t i = 0; i <= 2; ++i)
+		{
+			RCAC_theta(i,0) = _rcac_rate(0).get_rcac_theta(i);
+			RCAC_theta(i+4,0) = _rcac_rate(1).get_rcac_theta(i);
+			RCAC_theta(i+8,0) = _rcac_rate(2).get_rcac_theta(i);
 		}
 
 		return RCAC_theta;
@@ -181,21 +183,21 @@ public:
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC rate controller
 	 */
-	const int &get_RCAC_rate_ii() { return ii_AC_R; }
+	int get_RCAC_rate_ii() { return ii_AC_R; }
 
 	/**
 	 * 	Get the
 	 * 	@see RCAC_Aq_ON
 	 * 	@return Get RCAC rate controller switch
 	 */
-	const bool &get_RCAC_rate_switch() {return RCAC_Aw_ON;}
+	bool get_RCAC_rate_switch() {return RCAC_Aw_ON;}
 
 	/**
 	 * 	Get the
 	 * 	@see alpha_PID_rate
 	 * 	@return Get the gain that multiplies the rate PID gains.
 	 */
-	const float &get_alpha_PID_rate() {return alpha_PID_rate;}
+	float get_alpha_PID_rate() {return alpha_PID_rate;}
 
 
 	/**
@@ -229,41 +231,20 @@ public:
 	 * 	@see P_rate_x
 	 * 	@return RCAC P(1,1) of the Rate controller
 	 */
-	const float &get_RCAC_P11_Ratex() { return P_rate_x(0,0); }
-
+	float get_RCAC_P11_Ratex() { return _rcac_rate(0).get_rcac_P(0, 0); }
+		//return P_rate_x(0,0)
 	/**
 	 * 	Set RCAC variables.
 	 * 	@see all RCAC variables
 	 */
 	void init_RCAC_rate()
 	{
-		P_rate_x.setZero(); //= eye<float, 4>() * 0.00010;
-		P_rate_y.setZero(); //= eye<float, 4>() * 0.00010;
-		P_rate_z.setZero(); //= eye<float, 4>() * 0.00010;
-		for (int i = 0; i <= 3; i++) {
-			P_rate_x(i,i) = 0.001f;
-			P_rate_y(i,i) = 0.001f;
-			P_rate_z(i,i) = 0.001f;
-			P_rate_x(i,i) = rcac_rate_P0;
-			P_rate_y(i,i) = rcac_rate_P0;
-			P_rate_z(i,i) = rcac_rate_P0;
+		for (size_t i = 0; i <= 2; ++i)
+		{
+			// Jun 9th 2021: Asked to flip the sign of the filter coef.
+			_rcac_rate(i) = RCAC(rcac_rate_P0, 1.0, -1.0);
 		}
-		for (int i = 0; i <= 2; i++) {
-			N1_rate(i) = 1;
-		}
-		phi_k_rate_x.setZero();
-		phi_k_rate_y.setZero();
-		phi_k_rate_z.setZero();
-		phi_km1_rate_x.setZero();
-		phi_km1_rate_y.setZero();
-		phi_km1_rate_z.setZero();
-		theta_k_rate_x.setZero();
-		theta_k_rate_y.setZero();
-		theta_k_rate_z.setZero();
-		u_k_rate.setZero();
-		z_k_rate.setZero();
-		u_km1_rate.setZero();
-		z_km1_rate.setZero();
+		resetIntegral();
 	}
 
 	/**
@@ -290,7 +271,7 @@ private:
 
 	bool _mixer_saturation_positive[3] {};
 	bool _mixer_saturation_negative[3] {};
-	
+
 	int ii_AC_R = 0;
   	bool RCAC_Aw_ON=1;
 	// matrix::SquareMatrix<float, 12> P_AC_R;
@@ -298,6 +279,9 @@ private:
 	// matrix::Matrix<float, 12,1> theta_k_AC_R,theta_k_Ac_PID;
   	// matrix::Matrix<float, 3,1> z_k_AC_R, z_km1_AC_R,u_k_AC_R, u_km1_AC_R;
 	// matrix::SquareMatrix<float, 3> Gamma_AC_R, I3, N1_Aw;
+
+	// New RCAC_Class_Variables
+	matrix::Vector<RCAC, 3> _rcac_rate;
 
 	matrix::SquareMatrix<float, 4> P_rate_x,P_rate_y,P_rate_z;
 	matrix::Matrix<float, 1,4> phi_k_rate_x, phi_km1_rate_x;

@@ -73,7 +73,7 @@ bool MulticopterPositionControl::init()
 
 	_time_stamp_last_loop = hrt_absolute_time();
 
-	_control.init_RCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
+	_control.set_RCAC_r_v_P0(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
 
 	return true;
 }
@@ -140,9 +140,13 @@ int MulticopterPositionControl::parameters_update(bool force)
 		// initialize vectors from params and enforce constraints
 		_param_mpc_tko_speed.set(math::min(_param_mpc_tko_speed.get(), _param_mpc_z_vel_max_up.get()));
 		_param_mpc_land_speed.set(math::min(_param_mpc_land_speed.get(), _param_mpc_z_vel_max_dn.get()));
+		_control.set_RCAC_r_v_P0(_param_mpc_rcac_pos_p0.get(),_param_mpc_rcac_vel_p0.get());
 	}
 
-	_control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
+	// _control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
+	// _control.resetRCAC();
+
+
 
 	return OK;
 }
@@ -266,7 +270,7 @@ void MulticopterPositionControl::Run()
 
 		poll_subscriptions();
 
-		
+
 		float RCAC_switch = _rc_channels_switch.channels[14];
 		// SITL 1
 		RCAC_switch = 1.0f;
@@ -283,7 +287,7 @@ void MulticopterPositionControl::Run()
 		}
 		float PID_scale_f = _rc_channels_switch.channels[13];
 		// SITL 2
-		PID_scale_f = 1.0f;
+		PID_scale_f = -1.0f;
 		_control.set_PID_pv_factor(PID_scale_f, _param_mpc_pos_alpha.get(), _param_mpc_vel_alpha.get());
 
 		parameters_update(false);
@@ -316,7 +320,7 @@ void MulticopterPositionControl::Run()
 
 				if (constraints.reset_integral) {
 					_control.resetIntegral();
-					_control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
+					_control.resetRCAC();
 				}
 			}
 
@@ -359,7 +363,7 @@ void MulticopterPositionControl::Run()
 			_control.getAttitudeSetpoint(attitude_setpoint);
 			_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 
-publish_rcac_pos_vel_variables(PID_scale_f, RCAC_switch);
+			publish_rcac_pos_vel_variables(PID_scale_f, RCAC_switch);
 
 		} else {
 			// reset the numerical derivatives to not generate d term spikes when coming from non-position controlled operation

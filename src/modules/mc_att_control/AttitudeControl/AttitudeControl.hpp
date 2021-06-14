@@ -50,6 +50,8 @@
 
 #include <matrix/matrix/math.hpp>
 #include <mathlib/math/Limits.hpp>
+#include <mathlib/mathlib.h>
+#include <px4_log.h>
 
 class AttitudeControl
 {
@@ -103,6 +105,7 @@ public:
 
 		for (int i = 0; i <= 2; i++) {
 			RCAC_z(i) = z_k_Pq_R(i);
+			// RCAC_z(i) = _rcac_att(i).get_rcac_zk();
 		}
 
 		return RCAC_z;
@@ -118,7 +121,8 @@ public:
 		matrix::Vector3f RCAC_u{};
 
 		for (int i = 0; i <= 2; i++) {
-			RCAC_u(i) = u_k_Pq_R(i);
+			// RCAC_u(i) = u_k_Pq_R(i);
+			RCAC_u(i) = _rcac_att(i).get_rcac_uk();
 		}
 
 		return RCAC_u;
@@ -133,8 +137,9 @@ public:
 	{
 		matrix::Vector3f RCAC_theta{};
 
+		// TODO: Fix Usage
 		for (int i = 0; i <= 2; i++) {
-			RCAC_theta(i) = theta_k_Pq_R(i);
+			RCAC_theta(i) = _rcac_att(i).get_rcac_theta(0);//theta_k_Pq_R(i);
 		}
 
 		return RCAC_theta;
@@ -161,21 +166,21 @@ public:
 	 * 	@see ii
 	 * 	@return Iteration step of the RCAC attitude controller
 	 */
-	const int &get_RCAC_att_ii() { return ii_Pq_R; }
+	int get_RCAC_att_ii() { return ii_Pq_R; }
 
 	/**
 	 * 	Get the
 	 * 	@see RCAC_Aq_ON
 	 * 	@return Get RCAC attitude controller switch
 	 */
-	const bool &get_RCAC_att_switch() {return RCAC_Aq_ON;}
+	bool get_RCAC_att_switch() {return RCAC_Aq_ON;}
 
 	/**
 	 * 	Get the
 	 * 	@see alpha_PID_att
 	 * 	@return Get the gain that multiplies the attitude PID gains.
 	 */
-	const float &get_alpha_PID_att() {return alpha_PID_att;}
+	float get_alpha_PID_att() {return alpha_PID_att;}
 
 	/**
 	 * 	Set the RCAC Attitude switch.
@@ -208,34 +213,18 @@ public:
 	 * 	@see P_Pq_R
 	 * 	@return RCAC P(1,1) of the Attitude controller
 	 */
-	const float &get_RCAC_P11_Att() { return P_Pq_R(0,0); }
-
+	float get_RCAC_P11_Att() { return _rcac_att(0).get_rcac_P(0, 0); }
+		//return P_Pq_R(0,0);
 	/**
 	 * 	Set RCAC variables.
 	 * 	@see all RCAC variables
 	 */
 	void init_RCAC_att()
 	{
-		// P_Pq_R = eye<float, 3>() * 0.010;
-		// N1_Pq = eye<float, 3>();
-		// I3 = eye<float, 3>();
-		P_Pq_R.setZero();
-		N1_Pq.setZero();
-		I3.setZero();
-		for (int i = 0; i <= 2; i++) {
-			P_Pq_R(i,i) = 0.01f;
-			P_Pq_R(i,i) = rcac_att_P0;
-			N1_Pq(i,i) = 1.0f;
-			I3(i,i) = 1.0f;
+		for (size_t i = 0; i <= 2; ++i)
+		{
+			_rcac_att(i) = RCAC(rcac_att_P0, 1.0, -1.0);//RCAC(rcac_att_P0);
 		}
-		phi_k_Pq_R.setZero();
-		phi_km1_Pq_R.setZero();
-		theta_k_Pq_R.setZero();
-		z_k_Pq_R.setZero();
-		z_km1_Pq_R.setZero();
-		u_k_Pq_R.setZero();
-		u_km1_Pq_R.setZero();
-		Gamma_Pq_R.setZero();
 	}
 
 	/**
@@ -265,6 +254,9 @@ private:
 	matrix::Vector3f theta_k_Pq_R,theta_k_Pq_PID;
   	matrix::Vector3f z_k_Pq_R, z_km1_Pq_R,u_k_Pq_R, u_km1_Pq_R;
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
+
+	// New RCAC_Class_Variables
+	matrix::Vector<RCAC, 3> _rcac_att;
 
 	//float alpha_PID = 1.0f;
 	float alpha_PID_att = 1.0f;

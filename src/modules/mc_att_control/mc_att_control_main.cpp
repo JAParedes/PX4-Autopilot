@@ -98,7 +98,7 @@ MulticopterAttitudeControl::parameters_updated()
 						radians(_param_mc_yawrate_max.get())));
 
 	_man_tilt_max = math::radians(_param_mpc_man_tilt_max.get());
-	
+
 	//Set P0 for RCAC attitude and Rate controller
 	_attitude_control.set_RCAC_att_P0(_param_mpc_rcac_att_P0.get());
 	_attitude_control.init_RCAC_att();
@@ -227,7 +227,7 @@ MulticopterAttitudeControl::publish_rcac_att_variables()
 {
 	_rcac_att_variables.timestamp = hrt_absolute_time();
 	_rcac_att_variables.ii_att = _attitude_control.get_RCAC_att_ii();
-	
+
 
 	_rcac_att_variables.switch_att = _attitude_control.get_RCAC_att_switch();
 
@@ -297,7 +297,8 @@ MulticopterAttitudeControl::Run()
 		float PID_scale_f = _rc_channels_switch.channels[13];
 		// SITL
 		RCAC_switch = 1.0f;
-		PID_scale_f = 1.0f;
+		//TODO: Change this back if alpha ends up being broken
+		PID_scale_f = -1.0f;
 		if (RCAC_switch>0.0f)
 		{
 			_attitude_control.set_RCAC_att_switch(_param_mpc_rcac_att_sw.get());
@@ -311,7 +312,7 @@ MulticopterAttitudeControl::Run()
 
 		// _attitude_control.set_RCAC_att_switch(_rc_channels_switch.channels[14]);
 		// _attitude_control.set_PID_att_factor(_rc_channels_switch.channels[13]);
-		
+
 		// // Ankit: RCAC switches and the PID scaling factor for SITL testing
 		// _attitude_control.set_RCAC_att_switch(-1.0f);
 		// _attitude_control.set_PID_att_factor(1.0f);
@@ -379,7 +380,7 @@ MulticopterAttitudeControl::Run()
 				_man_x_input_filter.reset(0.f);
 				_man_y_input_filter.reset(0.f);
 			}
-			
+
 			//Juan: Made changes to controller inputs
 			const bool landed = _maybe_landed || _landed;
 			Vector3f rates_sp = _attitude_control.update(q, landed);
