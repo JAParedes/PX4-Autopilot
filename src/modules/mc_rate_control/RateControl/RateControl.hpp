@@ -95,7 +95,12 @@ public:
 	 * Set the integral term to 0 to prevent windup
 	 * @see _rate_int
 	 */
-	void resetIntegral() { _rate_int.zero(); }
+	void resetIntegral()
+	{
+		_rate_int.zero();
+		for (int i = 0; i < 3; ++i)
+			_rcac_rate(i).reset_integral();
+	}
 
 	/**
 	 * Get status message of controller for logging/debugging
@@ -245,8 +250,9 @@ public:
 		for (size_t i = 0; i <= 2; ++i)
 		{
 			// Jun 9th 2021: Asked to flip the sign of the filter coef.
-			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -1.0);
+			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -1.0, _lim_int(i));
 		}
+		// This is PX4's integral reset method.
 		resetIntegral();
 	}
 

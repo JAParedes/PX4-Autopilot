@@ -207,7 +207,7 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 			{
 				matrix::Matrix<float, 1, RCAC_VEL_L_THETA> Phi_vel;
 				Phi_vel(0, 0) = z_k_vel(i);
-				Phi_vel(0, 1) = _vel_int(i);
+				Phi_vel(0, 1) = _rcac_vel(0, i).get_rcac_integral(); //_vel_int(i);
 				Phi_vel(0, 2) = _vel_dot(i);
 				u_k_vel(i) = _rcac_vel(0,i).compute_uk(z_k_vel(i), Phi_vel, u_km1_vel(i), e_fun_vel);
 			}
@@ -259,7 +259,13 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 
 	// Make sure integral doesn't get NAN
 	ControlMath::setZeroIfNanVector3f(vel_error);
-	// Update integral part of velocity control
+	// Update integral of Velocity Control - RCAC Implementaiton
+	for (int i = 0; i < 3; ++i) {
+		//RCAC lib method
+		_rcac_vel(0, i).update_integral(vel_error(i), dt);
+	}
+
+	// Update integral part of velocity control - PX4 Implementation
 	_vel_int += vel_error.emult(_gain_vel_i) * dt;
 
 	// limit thrust integral
@@ -466,6 +472,6 @@ void PositionControl::init_RCAC_pos()
 void PositionControl::init_RCAC_vel()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_vel(0,i) = RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>(rcac_vel_P0, 1.0, rcac_vel_Rblock[0], rcac_vel_Rblock[1], -1.0);
+		_rcac_vel(0,i) = RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>(rcac_vel_P0, 1.0, rcac_vel_Rblock[0], rcac_vel_Rblock[1], -1.0, CONSTANTS_ONE_G);
 	}
 }

@@ -169,7 +169,12 @@ public:
 	 * Set the integral term in xy to 0.
 	 * @see _vel_int
 	 */
-	void resetIntegral() { _vel_int.setZero(); }
+	void resetIntegral()
+	{
+		_vel_int.setZero();
+		for (int i = 0; i < 3; ++i)
+			_rcac_vel(0, i).reset_integral();
+	}
 
 	/**
 	 * Get the controllers output local position setpoint
