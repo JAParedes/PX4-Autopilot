@@ -70,10 +70,7 @@ bool MulticopterPositionControl::init()
 
 	// limit to every other vehicle_local_position update (50 Hz)
 	_local_pos_sub.set_interval_us(20_ms);
-
 	_time_stamp_last_loop = hrt_absolute_time();
-
-	_control.set_RCAC_r_v_P0(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
 
 	return true;
 }
@@ -140,13 +137,11 @@ int MulticopterPositionControl::parameters_update(bool force)
 		// initialize vectors from params and enforce constraints
 		_param_mpc_tko_speed.set(math::min(_param_mpc_tko_speed.get(), _param_mpc_z_vel_max_up.get()));
 		_param_mpc_land_speed.set(math::min(_param_mpc_land_speed.get(), _param_mpc_z_vel_max_dn.get()));
-		_control.set_RCAC_r_v_P0(_param_mpc_rcac_pos_p0.get(),_param_mpc_rcac_vel_p0.get());
+
+		_control.set_RCAC_pos_vel_P0(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
+		_control.init_RCAC_pos();
+		_control.init_RCAC_vel();
 	}
-
-	// _control.resetRCAC(_param_mpc_rcac_pos_p0.get(), _param_mpc_rcac_vel_p0.get());
-	// _control.resetRCAC();
-
-
 
 	return OK;
 }
@@ -304,6 +299,16 @@ void MulticopterPositionControl::Run()
 
 		vehicle_local_position_setpoint_s setpoint;
 
+		if (_vehicle_land_detected_sub.updated()) {
+			vehicle_land_detected_s vehicle_land_detected;
+
+			if (_vehicle_land_detected_sub.copy(&vehicle_land_detected)) {
+				_landed = vehicle_land_detected.landed;
+				_maybe_landed = vehicle_land_detected.maybe_landed;
+			}
+		}
+		const bool landed = _maybe_landed || _landed;
+
 		// check if any task is active
 		if (_trajectory_setpoint_sub.update(&setpoint)) {
 			_control.setInputSetpoint(setpoint);
@@ -320,12 +325,12 @@ void MulticopterPositionControl::Run()
 
 				if (constraints.reset_integral) {
 					_control.resetIntegral();
-					_control.resetRCAC();
+					//_control.init_RCAC_pos_vel();
 				}
 			}
 
 			// Run position control
-			if (_control.update(dt)) {
+			if (_control.update(dt, landed)) {
 				_failsafe_land_hysteresis.set_state_and_update(false, time_stamp_now);
 
 			} else {
@@ -342,7 +347,7 @@ void MulticopterPositionControl::Run()
 				constraints = {0, NAN, NAN, NAN, NAN, NAN, NAN, NAN, false, {}};
 				_control.setConstraints(constraints);
 
-				_control.update(dt);
+				_control.update(dt, landed);
 			}
 
 			// Publish internal position control setpoints

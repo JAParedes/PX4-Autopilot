@@ -63,6 +63,8 @@
 #include <uORB/topics/rcac_pos_vel_variables.h>
 #include <uORB/topics/rc_channels.h>
 
+#include <uORB/topics/vehicle_land_detected.h>
+
 #include "PositionControl/PositionControl.hpp"
 
 using namespace time_literals;
@@ -106,9 +108,12 @@ private:
 	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
 	uORB::Subscription _vehicle_constraints_sub{ORB_ID(vehicle_constraints)};
 	uORB::Subscription _rc_channels_sub{ORB_ID(rc_channels)}; 			/**< Switch from the RC channel */
+	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
 
 	hrt_abstime	_time_stamp_last_loop{0};		/**< time stamp of last loop iteration */
 
+	bool _landed{true};
+	bool _maybe_landed{true};
 	int _task_failure_count{0};         /**< counter for task failures */
 
 	vehicle_control_mode_s	_control_mode{};		/**< vehicle control mode */

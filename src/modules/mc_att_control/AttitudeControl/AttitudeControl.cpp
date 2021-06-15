@@ -111,7 +111,9 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 
 			for (size_t i = 0; i <= 2; ++i)
 			{
-				u_k_Pq_R(i) = _rcac_att(i).compute_uk(z_k_Pq_R(i), 0, 0, u_km1_Pq_R(i));
+				matrix::Matrix<float, 1, RCAC_ATT_L_THETA> Phi_att;
+				Phi_att(0, 0) = z_k_Pq_R(i);
+				u_k_Pq_R(i) = _rcac_att(i).compute_uk(z_k_Pq_R(i), Phi_att, u_km1_Pq_R(i), e_fun_att);
 			}
 			++ii_Pq_R;
 			//PX4_INFO("Hi");

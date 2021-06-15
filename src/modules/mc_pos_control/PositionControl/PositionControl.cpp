@@ -108,15 +108,16 @@ void PositionControl::setConstraints(const vehicle_constraints_s &constraints)
 	// ignore _constraints.speed_xy TODO: remove it completely as soon as no task uses it anymore to avoid confusion
 }
 
-bool PositionControl::update(const float dt)
+bool PositionControl::update(const float dt, const bool landed)
 {
 	// x and y input setpoints always have to come in pairs
 	const bool valid = (PX4_ISFINITE(_pos_sp(0)) == PX4_ISFINITE(_pos_sp(1)))
 			   && (PX4_ISFINITE(_vel_sp(0)) == PX4_ISFINITE(_vel_sp(1)))
 			   && (PX4_ISFINITE(_acc_sp(0)) == PX4_ISFINITE(_acc_sp(1)));
 
-	_positionControl();
-	_velocityControl(dt);
+
+	_positionControl(landed);
+	_velocityControl(dt, landed);
 
 	_yawspeed_sp = PX4_ISFINITE(_yawspeed_sp) ? _yawspeed_sp : 0.f;
 	_yaw_sp = PX4_ISFINITE(_yaw_sp) ? _yaw_sp : _yaw; // TODO: better way to disable yaw control
@@ -124,45 +125,51 @@ bool PositionControl::update(const float dt)
 	return valid && _updateSuccessful();
 }
 
-void PositionControl::_positionControl()
+void PositionControl::_positionControl(const bool landed)
 {
 	// P-position controller
 	Vector3f vel_sp_position = (_pos_sp - _pos).emult(_gain_pos_p);
 	// PX4_INFO("vel_sp_ff = \t%8.6f \t%8.6f \t%8.6f", (double)vel_sp_position(0), (double)vel_sp_position(1), (double)vel_sp_position(2));
 
-	for (int i = 0; i <=2; i++)
-	{
-		if (isnan(_pos_sp(i)) || isnan(_vel_sp(i)))
-		{
-			islanded = true;
-			since_takeoff = 0;
-			break;
-		}
-		else
-		{
-			islanded = false;
-		}
-	}
+	// for (int i = 0; i <=2; i++)
+	// {
+	// 	if (isnan(_pos_sp(i)) || isnan(_vel_sp(i)))
+	// 	{
+	// 		islanded = true;
+	// 		since_takeoff = 0;
+	// 		break;
+	// 	}
+	// 	else
+	// 	{
+	// 		islanded = false;
+	// 	}
+	// }
 
-	z_k_r = _pos_sp - _pos;
-	u_k_r.setZero();
+	z_k_pos = _pos_sp - _pos;
+	u_k_pos.setZero();
 
-	if ((RCAC_Pr_ON) && (!islanded))
+	if ((RCAC_pos_ON) && (!landed))
 	{
-		if (since_takeoff == 0)
+		if (_rcac_pos(0,0).getkk() == 0)
 		{
-			resetRCAC();
-			since_takeoff++;
+			init_RCAC_pos();
+			u_km1_pos = u_k_pos;
+			// since_takeoff++;
 		}
 
 		for (int i = 0; i <= 2; i++)
-		{
-			u_k_r(i) = _rcac_r(0,i).compute_uk(z_k_r(i), 0, 0, u_km1_r(i));
+		{	if (((i < 2) || ((i == 2) && (_pos_sp(2) < 0))) && (!isnan(_pos_sp(2))))
+			{
+				matrix::Matrix<float, 1, RCAC_POS_L_THETA> Phi_pos;
+				Phi_pos(0, 0) = z_k_pos(i);
+				u_k_pos(i) = _rcac_pos(0,i).compute_uk(z_k_pos(i), Phi_pos, u_km1_pos(i), e_fun_pos);
+			}
 		}
-		u_km1_r = u_k_r;
+		u_km1_pos = u_k_pos;
 	}
+	// else { since_takeoff = 0;};
 
-	vel_sp_position = alpha_PID_pos*vel_sp_position + u_k_r;
+	vel_sp_position = alpha_PID_pos*vel_sp_position + u_k_pos;
 	// PX4_INFO("vel_sp_ff = \t%8.6f \t%8.6f \t%8.6f", (double)vel_sp_position(0), (double)vel_sp_position(1), (double)vel_sp_position(2));
 
 	// Position and feed-forward velocity setpoints or position states being NAN results in them not having an influence
@@ -177,24 +184,38 @@ void PositionControl::_positionControl()
 	_vel_sp(2) = math::constrain(_vel_sp(2), -_constraints.speed_up, _constraints.speed_down);
 }
 
-void PositionControl::_velocityControl(const float dt)
+void PositionControl::_velocityControl(const float dt, const bool landed)
 {
 	// PID velocity control
 	Vector3f vel_error = _vel_sp - _vel;
 	Vector3f acc_sp_velocity = vel_error.emult(_gain_vel_p) + _vel_int - _vel_dot.emult(_gain_vel_d);
 
-	z_k_v = _vel_sp - _vel;
+	z_k_vel = _vel_sp - _vel;
+	u_k_vel.setZero();
 
-	if ((RCAC_Pv_ON) && (!islanded))
+	if ((RCAC_vel_ON) && (!landed))
 	{
+		if (_rcac_vel(0,0).getkk() == 0)
+		{
+			init_RCAC_vel();
+			u_km1_vel = u_k_vel;
+		}
+
 		for (int i = 0; i <= 2; i++)
 		{
-			u_k_v(i) = _rcac_v(0,i).compute_uk(z_k_v(i), _vel_int(i), _vel_dot(i), u_km1_v(i));
+			if ((i < 2) && (!isnan(_pos_sp(0))))
+			{
+				matrix::Matrix<float, 1, RCAC_VEL_L_THETA> Phi_vel;
+				Phi_vel(0, 0) = z_k_vel(i);
+				Phi_vel(0, 1) = _vel_int(i);
+				Phi_vel(0, 2) = _vel_dot(i);
+				u_k_vel(i) = _rcac_vel(0,i).compute_uk(z_k_vel(i), Phi_vel, u_km1_vel(i), e_fun_vel);
+			}
 		}
-		u_km1_v = u_k_v;
+		u_km1_vel = u_k_vel;
 	}
 
-	acc_sp_velocity = alpha_PID_vel*acc_sp_velocity + u_k_v;
+	acc_sp_velocity = alpha_PID_vel*acc_sp_velocity + u_k_vel;
 
 	// No control input from setpoints or corresponding states which are NAN
 	ControlMath::addIfNotNanVector3f(_acc_sp, acc_sp_velocity);
@@ -223,6 +244,8 @@ void PositionControl::_velocityControl(const float dt)
 	// Saturate thrust in horizontal direction
 	const Vector2f thrust_sp_xy(_thr_sp);
 	const float thrust_sp_xy_norm = thrust_sp_xy.norm();
+
+
 
 	if (thrust_sp_xy_norm > thrust_max_xy) {
 		_thr_sp.xy() = thrust_sp_xy / thrust_sp_xy_norm * thrust_max_xy;
@@ -303,7 +326,7 @@ const matrix::Vector3f PositionControl::get_RCAC_pos_z()
 	matrix::Vector3f RCAC_z{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_z(i) = z_k_r(i);
+		RCAC_z(i) = z_k_pos(i);
 	}
 
 	return RCAC_z;
@@ -314,7 +337,7 @@ matrix::Vector3f PositionControl::get_RCAC_pos_u()
 	matrix::Vector3f RCAC_u{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_u(i) = _rcac_r(0,i).get_rcac_uk();
+		RCAC_u(i) = _rcac_pos(0,i).get_rcac_uk();
 	}
 
 	return RCAC_u;
@@ -325,10 +348,10 @@ const matrix::Vector3f PositionControl::get_RCAC_pos_theta()
 	matrix::Vector3f RCAC_theta{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_theta(i) = _rcac_r(0,i).get_rcac_theta(0);
+		RCAC_theta(i) = _rcac_pos(0,i).get_rcac_theta(0);
 
 		// for (int j = 0; j <= 2; j++){
-		// 	PX4_INFO("RCAC_theta(%d):\t%8.6f", i, (double)_rcac_r(0,i).get_rcac_theta(j));
+		// 	PX4_INFO("RCAC_theta(%d):\t%8.6f", i, (double)_rcac_pos(0,i).get_rcac_theta(j));
 		// }
 	}
 
@@ -367,7 +390,7 @@ const matrix::Vector3f PositionControl::get_RCAC_vel_z()
 	matrix::Vector3f RCAC_z{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_z(i) = z_k_v(i);
+		RCAC_z(i) = z_k_vel(i);
 	}
 
 	return RCAC_z;
@@ -378,7 +401,7 @@ const matrix::Vector3f PositionControl::get_RCAC_vel_u()
 	matrix::Vector3f RCAC_u{};
 
 	for (int i = 0; i <= 2; i++) {
-		RCAC_u(i) = _rcac_v(0,i).get_rcac_uk();
+		RCAC_u(i) = _rcac_vel(0,i).get_rcac_uk();
 	}
 
 	return RCAC_u;
@@ -391,9 +414,9 @@ const matrix::Matrix<float, 9,1> PositionControl::get_RCAC_vel_theta()
 
 	for (int i = 0; i <= 2; i++)
 	{
-		RCAC_vel_theta(i,0) = _rcac_v(0,0).get_rcac_theta(i);
-		RCAC_vel_theta(i+3,0) = _rcac_v(0,1).get_rcac_theta(i);
-		RCAC_vel_theta(i+6,0) = _rcac_v(0,2).get_rcac_theta(i);
+		RCAC_vel_theta(i,0) = _rcac_vel(0,0).get_rcac_theta(i);
+		RCAC_vel_theta(i+3,0) = _rcac_vel(0,1).get_rcac_theta(i);
+		RCAC_vel_theta(i+6,0) = _rcac_vel(0,2).get_rcac_theta(i);
 	}
 
 	return RCAC_vel_theta;
@@ -401,17 +424,17 @@ const matrix::Matrix<float, 9,1> PositionControl::get_RCAC_vel_theta()
 
 void PositionControl::set_RCAC_pos_switch(float switch_RCAC)
 {
-	RCAC_Pr_ON = 1;
+	RCAC_pos_ON = 1;
 	if (switch_RCAC < 0.0f) {
-		RCAC_Pr_ON = 0;
+		RCAC_pos_ON = 0;
 	}
 }
 
 void PositionControl::set_RCAC_vel_switch(float switch_RCAC)
 {
-	RCAC_Pv_ON = 1;
+	RCAC_vel_ON = 1;
 	if (switch_RCAC < 0.0f) {
-		RCAC_Pv_ON = 0;
+		RCAC_vel_ON = 0;
 	}
 }
 
@@ -425,10 +448,24 @@ void PositionControl::set_PID_pv_factor(float PID_factor, float pos_alpha, float
 	}
 }
 
-void PositionControl::resetRCAC()
+// void PositionControl::init_RCAC_pos_vel()
+// {
+// 	for (int i = 0; i <= 2; i++) {
+// 		_rcac_pos(0,i) = RCAC<RCAC_POS_L_THETA>(rcac_pos_P0, 1.0, -1.0);
+// 		_rcac_vel(0,i) = RCAC<RCAC_VEL_L_THETA>(rcac_vel_P0, 1.0, -1.0);
+// 	}
+// }
+
+void PositionControl::init_RCAC_pos()
 {
 	for (int i = 0; i <= 2; i++) {
-		_rcac_r(0,i) = RCAC(p0_r, 1.0, -1.0);
-		_rcac_v(0,i) = RCAC(p0_v, 1.0, -1.0);
+		_rcac_pos(0,i) = RCAC<RCAC_POS_L_THETA, RCAC_POS_L_RBLOCK>(rcac_pos_P0, 1.0, rcac_pos_Rblock[0], rcac_pos_Rblock[1], -1.0);
+	}
+}
+
+void PositionControl::init_RCAC_vel()
+{
+	for (int i = 0; i <= 2; i++) {
+		_rcac_vel(0,i) = RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>(rcac_vel_P0, 1.0, rcac_vel_Rblock[0], rcac_vel_Rblock[1], -1.0);
 	}
 }
