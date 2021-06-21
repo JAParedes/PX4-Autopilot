@@ -143,12 +143,13 @@ void PositionControl::_positionControl(const bool landed)
 			{
 				init_RCAC_pos();
 				u_km1_pos = u_k_pos;
-				// std::cout << "\npos_err_fun =\t" << rcac_pos_e_fun << "\n";
-				// std::cout << "\npos_Rblock_ON =\t" << rcac_pos_Rblock_ON << "\n";
-				// std::cout << "\npos_Rblock =\t" << rcac_pos_Rblock(0,0) << "\t" << rcac_pos_Rblock(1,1) << "\n";
-				// std::cout << "\npos_N =\t" << rcac_pos_N << "\n\n";
-				// std::cout << "\npos_P0 =\t" << rcac_pos_P0 << "\n\n";
-				// std::cout << "\npos_e_fun =\t" << rcac_pos_e_fun << "\n\n";
+
+				std::cout << "\npos_Rblock_ON =" << rcac_pos_Rblock_ON << "\n";
+				std::cout << "\npos_Rblock =" << rcac_pos_Rblock(0,0) << "\t" << rcac_pos_Rblock(1,1) << "\n";
+				std::cout << "\npos_N =" << rcac_pos_N << "\n";
+				std::cout << "\npos_P0 =" << rcac_pos_P0 << "\n";
+				std::cout << "\npos_e_fun =" << rcac_pos_e_fun << "\n";
+				std::cout << "\npos_PID_alpha =" << alpha_PID_pos << "\n\n";
 			}
 
 			for (int i = 0; i <= 2; i++)
@@ -164,8 +165,10 @@ void PositionControl::_positionControl(const bool landed)
 	}
 	else {init_RCAC_pos();};
 
-
+	// std::cout << "\nalpha_PID__pos =\t" << alpha_PID_pos << "\n";
 	vel_sp_position = alpha_PID_pos*vel_sp_position + u_k_pos;
+	// std::cout << "\nvel_sp_pos = [" << vel_sp_position(0) << ", " << vel_sp_position(1) << ", " << vel_sp_position(2) << "\n";
+	// std::cout << "\nvel_sp_pos(3) = FF =  " << vel_sp_position(3) << "\n";
 	// PX4_INFO("vel_sp_ff = \t%8.6f \t%8.6f \t%8.6f", (double)vel_sp_position(0), (double)vel_sp_position(1), (double)vel_sp_position(2));
 
 	// Position and feed-forward velocity setpoints or position states being NAN results in them not having an influence
@@ -198,20 +201,22 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 			{
 				init_RCAC_vel();
 				u_km1_vel = u_k_vel;
-				// std::cout << "\nvel_Rblock_ON =\t" << rcac_vel_Rblock_ON << "\n";
-				// std::cout << "\nvel_Rblock =\t" << rcac_vel_Rblock(0,0) << "\t" << rcac_vel_Rblock(1,1) << "\n";
-				// std::cout << "\nvel_N =\t" << rcac_vel_N << "\n\n";
-				// std::cout << "\nvel_P0 =\t" << rcac_vel_P0 << "\n\n";
-				// std::cout << "\nvel_e_fun =\t" << rcac_vel_e_fun << "\n\n";
+				std::cout << "\nvel_Rblock_ON =" << rcac_vel_Rblock_ON << "\n";
+				std::cout << "\nRz = " << rcac_vel_Rblock(0,0) << "\n";
+				std::cout << "\nRu = " << rcac_vel_Rblock(1,1) << "\n";
+				std::cout << "\nvel_N = " << rcac_vel_N << "\n";
+				std::cout << "\nvel_P0 = " << rcac_vel_P0 << "\n";
+				std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n";
+				std::cout << "\nvel_PID_alpha =" << alpha_PID_vel << "\n\n";
 			}
 
 			for (int i = 0; i <= 2; i++)
 			{
-				if ((i < 2) && (!isnan(_pos_sp(0))))
+				if (!isnan(_pos_sp(0)))
 				{
 					Phi_vel(0, 0) = z_k_vel(i);
 					Phi_vel(0, 1) = _vel_int(i);
-					Phi_vel(0, 2) = _vel_dot(i);
+					Phi_vel(0, 2) = _vel_dot(i) * 0;
 
 					u_k_vel(i) = _rcac_vel(0,i).compute_uk(z_k_vel(i), Phi_vel, u_km1_vel(i));
 				}
@@ -221,8 +226,13 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 	}
 	else {init_RCAC_vel();};
 
+	// std::cout << "\nacc_sp_velocity = [" << acc_sp_velocity(0) << ", " << acc_sp_velocity(1) << ", " << acc_sp_velocity(2) << "]\n";
+	// std::cout << "\nu_k_vel = [" << u_k_vel(0) << ", " << u_k_vel(1) << ", " << u_k_vel(2) << "]\n";
 
+	// std::cout << "\nalpha_PID__vel =\t" << alpha_PID_vel << "\n";
 	acc_sp_velocity = alpha_PID_vel*acc_sp_velocity + u_k_vel;
+
+
 
 	// No control input from setpoints or corresponding states which are NAN
 	ControlMath::addIfNotNanVector3f(_acc_sp, acc_sp_velocity);
