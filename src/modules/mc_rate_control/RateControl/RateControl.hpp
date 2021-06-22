@@ -250,7 +250,7 @@ public:
 		for (size_t i = 0; i <= 2; ++i)
 		{
 			// Jun 9th 2021: Asked to flip the sign of the filter coef.
-			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -1.0, _lim_int(i));
+			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -10, _lim_int(i));
 		}
 		// This is PX4's integral reset method.
 		resetIntegral();
@@ -305,7 +305,7 @@ private:
 	//float alpha_PID = 1.0f;
 	float alpha_PID_rate = 1.0f;
 	float rcac_rate_P0 = 0.0011f;
-	float rcac_rate_Rblock[2] = {1.0, 1.0};	// rcac_xxx_R[] = {Rz, Ru}
+	float rcac_rate_Rblock[2] = {1.0, 0.0};	// rcac_xxx_R[] = {Rz, Ru}
 	int e_fun_rate = 0;
 
 };
