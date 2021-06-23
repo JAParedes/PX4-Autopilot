@@ -253,6 +253,15 @@ public:
 	}
 	// const float &get_RCAC_att_P0() {return P_Pq_R(0,0);}
 
+	/**
+	 * 	Set the RCAC Attiude Controller Ru.
+	 * 	@see rcac_att_Ru
+	 */
+	void set_RCAC_att_Ru(float att_Ru)
+	{
+		rcac_att_Ru = att_Ru;
+	}
+
 private:
 	matrix::Vector3f _proportional_gain;
 	matrix::Vector3f _rate_limit;

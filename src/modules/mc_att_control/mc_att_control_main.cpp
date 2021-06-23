@@ -101,6 +101,7 @@ MulticopterAttitudeControl::parameters_updated()
 
 	//Set P0 for RCAC attitude and Rate controller
 	_attitude_control.set_RCAC_att_P0(_param_mpc_rcac_att_P0.get());
+	_attitude_control.set_RCAC_att_Ru(_param_mpc_rcac_att_Ru.get());
 	_attitude_control.init_RCAC_att();
 	PX4_INFO("Att Control P0:\t%8.6f", (double)_param_mpc_rcac_att_P0.get());
 

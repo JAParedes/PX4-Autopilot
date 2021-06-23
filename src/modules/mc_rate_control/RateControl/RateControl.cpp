@@ -37,6 +37,7 @@
 
 #include <RateControl.hpp>
 #include <px4_platform_common/defines.h>
+// #include <iostream>
 
 using namespace matrix;
 
@@ -81,6 +82,13 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 				// Initial derivative will be zero.
 				z_km1_rate = z_k_rate;
 				u_km1_rate = u_k_rate;
+
+				// std::cout << "\nrate_Rblock_ON =" << rcac_rate_Rblock_ON << "\n";
+				// std::cout << "\nrate_Rblock =" << rcac_rate_Rblock(0,0) << "\t" << rcac_rate_Rblock(1,1) << "\n";
+				// std::cout << "\nrate_N =" << rcac_rate_N << "\n";
+				// std::cout << "\nrate_P0 =" << rcac_rate_P0 << "\n";
+				// std::cout << "\nrate_e_fun =" << rcac_rate_e_fun << "\n";
+				// std::cout << "\nrate_PID_alpha =" << alpha_PID_rate << "\n\n";
 			}
 
 			// TODO: Sign of the integral term is unclear.

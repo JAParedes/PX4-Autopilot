@@ -40,7 +40,7 @@
 #include <float.h>
 #include <px4_platform_common/defines.h>
 #include <ecl/geo/geo.h>
-#include <iostream>
+// #include <iostream>
 
 using namespace matrix;
 
@@ -144,12 +144,12 @@ void PositionControl::_positionControl(const bool landed)
 				init_RCAC_pos();
 				u_km1_pos = u_k_pos;
 
-				std::cout << "\npos_Rblock_ON =" << rcac_pos_Rblock_ON << "\n";
-				std::cout << "\npos_Rblock =" << rcac_pos_Rblock(0,0) << "\t" << rcac_pos_Rblock(1,1) << "\n";
-				std::cout << "\npos_N =" << rcac_pos_N << "\n";
-				std::cout << "\npos_P0 =" << rcac_pos_P0 << "\n";
-				std::cout << "\npos_e_fun =" << rcac_pos_e_fun << "\n";
-				std::cout << "\npos_PID_alpha =" << alpha_PID_pos << "\n\n";
+				// std::cout << "\npos_Rblock_ON =" << rcac_pos_Rblock_ON << "\n";
+				// std::cout << "\npos_Rblock =" << rcac_pos_Rblock(0,0) << "\t" << rcac_pos_Rblock(1,1) << "\n";
+				// std::cout << "\npos_N =" << rcac_pos_N << "\n";
+				// std::cout << "\npos_P0 =" << rcac_pos_P0 << "\n";
+				// std::cout << "\npos_e_fun =" << rcac_pos_e_fun << "\n";
+				// std::cout << "\npos_PID_alpha =" << alpha_PID_pos << "\n\n";
 			}
 
 			for (int i = 0; i <= 2; i++)
@@ -201,13 +201,13 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 			{
 				init_RCAC_vel();
 				u_km1_vel = u_k_vel;
-				std::cout << "\nvel_Rblock_ON =" << rcac_vel_Rblock_ON << "\n";
-				std::cout << "\nRz = " << rcac_vel_Rblock(0,0) << "\n";
-				std::cout << "\nRu = " << rcac_vel_Rblock(1,1) << "\n";
-				std::cout << "\nvel_N = " << rcac_vel_N << "\n";
-				std::cout << "\nvel_P0 = " << rcac_vel_P0 << "\n";
-				std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n";
-				std::cout << "\nvel_PID_alpha =" << alpha_PID_vel << "\n\n";
+				// std::cout << "\nvel_Rblock_ON =" << rcac_vel_Rblock_ON << "\n";
+				// std::cout << "\nRz = " << rcac_vel_Rblock(0,0) << "\n";
+				// std::cout << "\nRu = " << rcac_vel_Rblock(1,1) << "\n";
+				// std::cout << "\nvel_N = " << rcac_vel_N << "\n";
+				// std::cout << "\nvel_P0 = " << rcac_vel_P0 << "\n";
+				// std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n";
+				// std::cout << "\nvel_PID_alpha =" << alpha_PID_vel << "\n\n";
 			}
 
 			for (int i = 0; i <= 2; i++)

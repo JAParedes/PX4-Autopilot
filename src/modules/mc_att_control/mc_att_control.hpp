@@ -175,8 +175,10 @@ uORB::Subscription _rc_channels_sub{ORB_ID(rc_channels)};				/**< RC switch>*/
 		(ParamFloat<px4::params::MC_MAN_TILT_TAU>) _param_mc_man_tilt_tau,
 		(ParamFloat<px4::params::MPC_RCAC_ATT_SW>) _param_mpc_rcac_att_sw,
 		(ParamFloat<px4::params::MPC_ATT_ALPHA>) _param_mpc_att_alpha,
-		(ParamFloat<px4::params::MPC_RCAC_ATT_P0>) _param_mpc_rcac_att_P0
+		(ParamFloat<px4::params::MPC_RCAC_ATT_P0>) _param_mpc_rcac_att_P0,
+		(ParamFloat<px4::params::MPC_RCAC_ATT_RU>) _param_mpc_rcac_att_Ru
 
-	)
+
+	);
 };
 

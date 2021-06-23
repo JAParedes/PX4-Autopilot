@@ -271,6 +271,15 @@ public:
 		rcac_rate_P0 = rate_P0;
 	}
 
+	/**
+	 * 	Set the RCAC Rate Controller Ru.
+	 * 	@see rcac_rate_Ru
+	 */
+	void set_RCAC_rate_Ru(float rate_Ru)
+	{
+		rcac_rate_Ru = rate_Ru;
+	}
+
 private:
 	void updateIntegral(matrix::Vector3f &rate_error, const float dt);
 

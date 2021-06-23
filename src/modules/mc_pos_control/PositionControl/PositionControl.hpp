@@ -341,14 +341,39 @@ public:
 	float get_RCAC_P11_Velx() { return _rcac_vel(0,0).get_rcac_P(0,0); }
 
 	/**
+	 * 	Get the
+	 *
+	 * 	@return RCAC Ru of the Position controller
+	 */
+	float get_RCAC_Ru_Pos() { return _rcac_pos(0,0).get_rcac_Ru(); }
+
+	/**
+	 * 	Get the
+	 *
+	 * 	@return RCAC Ru of the Velcity x controller
+	 */
+	float get_RCAC_Ru_Vel() { return _rcac_vel(0,0).get_rcac_Ru(); }
+
+	/**
 	 * 	Set P0 from value specified in mc_pos_control_params.c
 	 *
 	 */
-	void set_RCAC_pos_vel_P0(float r_P0, float v_P0)
+	void set_RCAC_pos_vel_P0(float pos_P0, float vel_P0)
 	{
-		rcac_pos_P0 = r_P0;
-		rcac_vel_P0 = v_P0;
+		rcac_pos_P0 = pos_P0;
+		rcac_vel_P0 = vel_P0;
 	}
+
+	/**
+	 * 	Set Ru from value specified in mc_pos_control_params.c
+	 *
+	 */
+	void set_RCAC_pos_vel_Ru(float pos_Ru, float vel_Ru)
+	{
+		rcac_pos_Ru = pos_Ru;
+		rcac_vel_Ru = vel_Ru;
+	}
+
 
 	/**
 	 * 	Reset RCAC variables
@@ -403,23 +428,14 @@ private:
 	matrix::Matrix<float, RCAC_POS_L_RBLOCK, RCAC_POS_L_RBLOCK> rcac_pos_Rblock;
 	matrix::Vector3f z_k_pos, u_k_pos, u_km1_pos;
 	bool rcac_pos_ON = 1;
-	int rcac_pos_Rblock_ON = 0;
+	int rcac_pos_Rblock_ON = 1;
 	int rcac_pos_e_fun = 0;
 	float rcac_pos_P0 = 0.005f;
 	float rcac_pos_Rz = 1.0;
-	float rcac_pos_Ru = 1.0;
+	float rcac_pos_Ru = 0.01;
 	float rcac_pos_lambda = 1.0;
-	float rcac_pos_N = -1.0;
+	float rcac_pos_N = -10;
 	float alpha_PID_pos = 1.0f;
-
-
-
-
-
-
-
-
-
 
 	// RCAC -- Velocity Controller
 	matrix::Matrix<RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>, 1, 3> _rcac_vel;
@@ -427,12 +443,12 @@ private:
 	matrix::Matrix<float, RCAC_VEL_L_RBLOCK, RCAC_VEL_L_RBLOCK> rcac_vel_Rblock;
 	matrix::Vector3f z_k_vel, u_k_vel, u_km1_vel, Pv_intg;
 	bool rcac_vel_ON = 1;
-	int rcac_vel_Rblock_ON = 0;
+	int rcac_vel_Rblock_ON = 1;
 	int rcac_vel_e_fun = 0;
 	float rcac_vel_P0 = 0.001f;
 	float rcac_vel_Rz = 1.0;
 	float rcac_vel_Ru = 1.0;
 	float rcac_vel_lambda = 1.0;
-	float rcac_vel_N = -1.0;
+	float rcac_vel_N = -10.0;
 	float alpha_PID_vel = 1.0f;
 };
