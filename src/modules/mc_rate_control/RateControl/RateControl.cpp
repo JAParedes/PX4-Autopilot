@@ -99,13 +99,17 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 				// std::cout << "\nrate_err_fun =" << rcac_rate_e_fun;
 				matrix::Matrix<float, 1, RCAC_RATE_L_THETA> Phi_rate;
 				Phi_rate(0, 0) = z_k_rate(i);
-				Phi_rate(0, 1) = _rate_int(i);
+				Phi_rate(0, 1) = _rcac_rate(i).get_rcac_integral(); //_rate_int(i);
 				Phi_rate(0, 2) = 0 * angular_accel(i);
 				u_k_rate(i) = _rcac_rate(i).compute_uk(z_k_rate(i), Phi_rate, u_km1_rate(i));
 			}
 			++ii_AC_R;
 		}
-
+		for (int i = 0; i < 3; ++i) {
+			//RCAC lib method
+			_rcac_rate(i).update_integral(rate_error(i), dt);
+		}
+		//PX4 Native Method
 		updateIntegral(rate_error, dt);
 	}
 	else
@@ -113,7 +117,8 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 		// Set iteration tracking variable to zero if the plane/QC has landed
 		ii_AC_R = 0;
 	}
-
+	// PX4_INFO("PX4 Integral:\t%8.4f", (double)_rate_int(0));
+	// PX4_INFO("RCAC Integral:\t%8.4f", (double)_rcac_rate(0).get_rcac_integral());
 	torque = alpha_PID_rate*torque+u_k_rate;
 	z_km1_rate = z_k_rate;
 	u_km1_rate = u_k_rate;
@@ -144,7 +149,8 @@ void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
 		i_factor = math::max(0.0f, 1.f - i_factor * i_factor);
 
 		// Perform the integration using a first order method
-		float rate_i = _rate_int(i) + i_factor * _gain_i(i) * rate_error(i) * dt;
+		// float rate_i = _rate_int(i) + i_factor * _gain_i(i) * rate_error(i) * dt;
+		float rate_i = _rate_int(i) + i_factor * rate_error(i) * dt;
 
 		// do not propagate the result if out of range or invalid
 		if (PX4_ISFINITE(rate_i)) {
