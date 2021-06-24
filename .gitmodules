@@ -69,4 +69,4 @@
 [submodule "src/lib/mathlib/math/RCAC"]
 	path = src/lib/mathlib/math/RCAC
 	url = https://github.com/ankgoel8188/RCAC_cpp_light.git
-	branch = Variable_RCAC_Joon
+	branch = RCAC_v2_dev

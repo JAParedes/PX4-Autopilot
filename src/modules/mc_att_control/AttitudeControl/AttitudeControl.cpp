@@ -36,8 +36,8 @@
  */
 
 #include <AttitudeControl.hpp>
-
 #include <mathlib/math/Functions.hpp>
+// #include <iostream>
 
 using namespace matrix;
 
@@ -107,13 +107,20 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 				init_RCAC_att();
 				//Make sure that u_km1_Pq_R is valid.
 				u_km1_Pq_R = u_k_Pq_R;
+
+				// std::cout << "\natt_Rblock_ON =" << rcac_att_Rblock_ON << "\n";
+				// std::cout << "\natt_Rblock =" << rcac_att_Rblock(0,0) << "\t" << rcac_att_Rblock(1,1) << "\n";
+				// std::cout << "\natt_N =" << rcac_att_N << "\n";
+				// std::cout << "\natt_P0 =" << rcac_att_P0 << "\n";
+				// std::cout << "\natt_e_fun =" << rcac_att_e_fun << "\n";
+				// std::cout << "\natt_PID_alpha =" << alpha_PID_att << "\n\n";
 			}
 
 			for (size_t i = 0; i <= 2; ++i)
 			{
 				matrix::Matrix<float, 1, RCAC_ATT_L_THETA> Phi_att;
 				Phi_att(0, 0) = z_k_Pq_R(i);
-				u_k_Pq_R(i) = _rcac_att(i).compute_uk(z_k_Pq_R(i), Phi_att, u_km1_Pq_R(i), e_fun_att);
+				u_k_Pq_R(i) = _rcac_att(i).compute_uk(z_k_Pq_R(i), Phi_att, u_km1_Pq_R(i));
 			}
 			++ii_Pq_R;
 			//PX4_INFO("Hi");

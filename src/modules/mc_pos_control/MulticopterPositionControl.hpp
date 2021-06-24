@@ -141,8 +141,10 @@ private:
 		(ParamFloat<px4::params::MPC_RCAC_VEL_SW>) _param_mpc_rcac_vel_sw,
 		(ParamFloat<px4::params::MPC_POS_ALPHA>) _param_mpc_pos_alpha,
 		(ParamFloat<px4::params::MPC_VEL_ALPHA>) _param_mpc_vel_alpha,
-		(ParamFloat<px4::params::MPC_RCAC_POS_P0>) _param_mpc_rcac_pos_p0,
-		(ParamFloat<px4::params::MPC_RCAC_VEL_P0>) _param_mpc_rcac_vel_p0,
+		(ParamFloat<px4::params::MPC_RCAC_POS_P0>) _param_mpc_rcac_pos_P0,
+		(ParamFloat<px4::params::MPC_RCAC_VEL_P0>) _param_mpc_rcac_vel_P0,
+		(ParamFloat<px4::params::MPC_RCAC_POS_RU>) _param_mpc_rcac_pos_Ru,
+		(ParamFloat<px4::params::MPC_RCAC_VEL_RU>) _param_mpc_rcac_vel_Ru,
 
 		// Takeoff / Land
 		(ParamFloat<px4::params::MPC_TKO_SPEED>) _param_mpc_tko_speed,

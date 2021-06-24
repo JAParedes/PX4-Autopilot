@@ -88,7 +88,7 @@ private:
 	 * initialize some vectors/matrices from parameters
 	 */
 	void		parameters_updated();
-	
+
 	void		publish_rcac_rate_variables();
 
 	RateControl _rate_control; ///< class for rate control calculations
@@ -119,7 +119,7 @@ private:
 	vehicle_control_mode_s		_v_control_mode{};
 	vehicle_status_s		_vehicle_status{};
 	rc_channels_s			_rc_channels_switch{};	/**< Switch from the RC channel */
-	rcac_rate_variables_s _rcac_rate_variables{}; 
+	rcac_rate_variables_s _rcac_rate_variables{};
 
 	bool _actuators_0_circuit_breaker_enabled{false};	/**< circuit breaker to suppress output */
 	bool _landed{true};
@@ -177,8 +177,9 @@ private:
 
 		(ParamFloat<px4::params::MPC_RCAC_RATE_SW>) _param_mpc_rcac_rate_sw,
 		(ParamFloat<px4::params::MPC_RATE_ALPHA>) _param_mpc_rate_alpha,
-		(ParamFloat<px4::params::MPC_RCAC_RATE_P0>) _param_mpc_rcac_rate_P0
-	)
+		(ParamFloat<px4::params::MPC_RCAC_RATE_P0>) _param_mpc_rcac_rate_P0,
+		(ParamFloat<px4::params::MPC_RCAC_RATE_RU>) _param_mpc_rcac_rate_Ru
+	);
 
 	matrix::Vector3f _acro_rate_max;	/**< max attitude rates in acro mode */
 

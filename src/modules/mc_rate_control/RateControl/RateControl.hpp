@@ -46,7 +46,7 @@
 #include <uORB/topics/rate_ctrl_status.h>
 
 #define RCAC_RATE_L_THETA 3
-#define RCAC_RATE_L_RBLOCK 1
+#define RCAC_RATE_L_RBLOCK 2
 
 class RateControl
 {
@@ -247,10 +247,22 @@ public:
 	 */
 	void init_RCAC_rate()
 	{
-		for (size_t i = 0; i <= 2; ++i)
+		if (rcac_rate_Rblock_ON)
 		{
-			// Jun 9th 2021: Asked to flip the sign of the filter coef.
-			_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, 1.0, rcac_rate_Rblock[0],rcac_rate_Rblock[1], -10, _lim_int(i));
+			rcac_rate_Rblock(0,0) = rcac_rate_Rz;
+			rcac_rate_Rblock(1,1) = rcac_rate_Ru;
+
+			for (int i = 0; i <= 2; i++)
+			{
+				_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, rcac_rate_lambda, rcac_rate_Rblock, rcac_rate_N, rcac_rate_e_fun, _lim_int(i));
+			}
+		}
+		else
+		{
+			for (int i = 0; i <= 2; i++)
+			{
+				_rcac_rate(i) = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(rcac_rate_P0, rcac_rate_lambda, rcac_rate_N, rcac_rate_e_fun, _lim_int(i));
+			}
 		}
 		// This is PX4's integral reset method.
 		resetIntegral();
@@ -263,6 +275,15 @@ public:
 	void set_RCAC_rate_P0(float rate_P0)
 	{
 		rcac_rate_P0 = rate_P0;
+	}
+
+	/**
+	 * 	Set the RCAC Rate Controller Ru.
+	 * 	@see rcac_rate_Ru
+	 */
+	void set_RCAC_rate_Ru(float rate_Ru)
+	{
+		rcac_rate_Ru = rate_Ru;
 	}
 
 private:
@@ -282,7 +303,7 @@ private:
 	bool _mixer_saturation_negative[3] {};
 
 	int ii_AC_R = 0;
-  	bool RCAC_Aw_ON=1;
+
 
 	// matrix::SquareMatrix<float, 12> P_AC_R;
 	// matrix::Matrix<float, 3,12> phi_k_AC_R, phi_km1_AC_R;
@@ -292,6 +313,17 @@ private:
 
 	// New RCAC_Class_Variables
 	matrix::Vector<RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>, 3> _rcac_rate;
+	matrix::Matrix<float, RCAC_RATE_L_RBLOCK, RCAC_RATE_L_RBLOCK> rcac_rate_Rblock;
+	bool RCAC_Aw_ON=1;
+	bool rcac_rate_Rblock_ON = 1;
+	int rcac_rate_e_fun = 0;
+	float rcac_rate_P0 = 0.0011f;
+	float rcac_rate_Rz = 1.0;
+	float rcac_rate_Ru = 1.0;
+	float rcac_rate_lambda = 1.0;
+	float rcac_rate_N = -1.0;
+	float alpha_PID_rate = 1.0f;
+
 
 	matrix::SquareMatrix<float, 4> P_rate_x,P_rate_y,P_rate_z;
 	matrix::Matrix<float, 1,4> phi_k_rate_x, phi_km1_rate_x;
@@ -303,9 +335,5 @@ private:
 	matrix::Matrix<float, 1,1> dummy1,dummy2,dummy3;
 
 	//float alpha_PID = 1.0f;
-	float alpha_PID_rate = 1.0f;
-	float rcac_rate_P0 = 0.0011f;
-	float rcac_rate_Rblock[2] = {1.0, 0.0};	// rcac_xxx_R[] = {Rz, Ru}
-	int e_fun_rate = 0;
 
 };
