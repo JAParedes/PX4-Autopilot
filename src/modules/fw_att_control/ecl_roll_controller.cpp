@@ -41,7 +41,7 @@
 #include "ecl_roll_controller.h"
 #include <float.h>
 #include <lib/ecl/geo/geo.h>
-#include <mathlib/mathlib.h>
+// #include <mathlib/mathlib.h>
 
 float ECL_RollController::control_attitude(const float dt, const ECL_ControlData &ctl_data)
 {
@@ -78,6 +78,10 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.body_x_rate;
 
+	/* Initialize RCAC on first iteration and roll switched on. */
+	if (RCAC_roll_SW && _rcac_roll.getkk() == 0)
+		init_RCAC_roll();
+
 	if (!ctl_data.lock_integrator && _k_i > 0.0f) {
 
 		/* Integral term scales with 1/IAS^2 */
@@ -97,6 +101,10 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 
 		/* add and constrain */
 		_integrator = math::constrain(_integrator + id * _k_i, -_integrator_max, _integrator_max);
+
+		/* RCAC lib integrator (No gain with integral) */
+		if (RCAC_roll_SW)
+			_rcac_roll.update_integral(id, dt);
 	}
 
 	/* Apply PI rate controller and store non-limited output */
@@ -104,6 +112,26 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 	_last_output = _bodyrate_setpoint * _k_ff * ctl_data.scaler +
 		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
 		       + _integrator;
+
+	if (RCAC_roll_SW)
+	{
+		if (_rcac_roll.getkk() == 0) {
+			// Initial derivative will be zero.
+			z_km1_roll = z_k_roll;
+			u_km1_roll = u_k_roll;
+		}
+
+		matrix::Matrix<float, 1, RCAC_ROLL_L_THETA> Phi_roll;
+		Phi_roll(0, 0) = z_k_roll;
+		Phi_roll(0, 1) = _rcac_roll.get_rcac_integral();
+		u_k_roll = _rcac_roll.compute_uk(z_k_roll, Phi_roll, u_km1_roll);
+	}
+
+	_last_output = alpha_PID_roll * _last_output + u_k_roll;
+
+	// Update km1 variables for next iteration.
+	z_km1_roll = z_k_roll;
+	u_km1_roll = u_k_roll;
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
@@ -116,4 +144,19 @@ float ECL_RollController::control_euler_rate(const float dt, const ECL_ControlDa
 	set_bodyrate_setpoint(_bodyrate_setpoint);
 
 	return control_bodyrate(dt, ctl_data);
+}
+
+void ECL_RollController::init_RCAC_roll()
+{
+	if (RCAC_roll_Rblock_SW)
+	{
+		rcac_roll_Rblock(0,0) = rcac_roll_Rz;
+		rcac_roll_Rblock(1,1) = rcac_roll_Ru;
+		_rcac_roll = RCAC<RCAC_ROLL_L_THETA, RCAC_ROLL_L_RBLOCK> (rcac_roll_P0, rcac_roll_lambda, rcac_roll_Rblock, rcac_roll_N, rcac_roll_e_fun, _integrator_max);
+	}
+
+	else
+	{
+		_rcac_roll = RCAC<RCAC_ROLL_L_THETA, RCAC_ROLL_L_RBLOCK> (rcac_roll_P0, rcac_roll_lambda, rcac_roll_N, rcac_roll_e_fun, _integrator_max);
+	}
 }

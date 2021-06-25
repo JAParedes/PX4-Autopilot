@@ -49,7 +49,11 @@
 #ifndef ECL_ROLL_CONTROLLER_H
 #define ECL_ROLL_CONTROLLER_H
 
+#define RCAC_ROLL_L_THETA 2 // P-D Control RCAC
+#define RCAC_ROLL_L_RBLOCK 2
+
 #include "ecl_controller.h"
+#include <mathlib/mathlib.h>
 
 class ECL_RollController :
 	public ECL_Controller
@@ -61,6 +65,34 @@ public:
 	float control_attitude(const float dt, const ECL_ControlData &ctl_data) override;
 	float control_euler_rate(const float dt, const ECL_ControlData &ctl_data) override;
 	float control_bodyrate(const float dt, const ECL_ControlData &ctl_data) override;
+
+	void init_RCAC_roll();
+
+private:
+	/* RCAC Getter Functions - For Publishing */
+
+	/* RCAC Setter Functions - For Alteration in QGC */
+	void set_RCAC_roll_Ru(float roll_Ru)
+	{
+		rcac_roll_Ru = roll_Ru;
+	}
+
+	// Jun 24, 2021: New RCAC Variables
+	matrix::Matrix<float, RCAC_ROLL_L_RBLOCK, RCAC_ROLL_L_RBLOCK> rcac_roll_Rblock;
+
+	RCAC<RCAC_ROLL_L_THETA, RCAC_ROLL_L_RBLOCK> _rcac_roll;
+	float z_k_roll, z_km1_roll, u_k_roll, u_km1_roll;
+
+	bool RCAC_roll_SW = false;
+	bool RCAC_roll_Rblock_SW = false;
+
+	int rcac_roll_e_fun = 0;
+	float rcac_roll_P0 = 0.0011f;
+	float rcac_roll_Rz = 1.0;
+	float rcac_roll_Ru = 1.0;
+	float rcac_roll_lambda = 1.0;
+	float rcac_roll_N = -1.0;
+	float alpha_PID_roll = 1.0f;
 };
 
 #endif // ECL_ROLL_CONTROLLER_H

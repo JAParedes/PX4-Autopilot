@@ -105,11 +105,8 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 			}
 			++ii_AC_R;
 		}
-		for (int i = 0; i < 3; ++i) {
-			//RCAC lib method
-			_rcac_rate(i).update_integral(rate_error(i), dt);
-		}
-		//PX4 Native Method
+
+		//PX4 AND RCAC Update in a single
 		updateIntegral(rate_error, dt);
 	}
 	else
@@ -117,8 +114,7 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 		// Set iteration tracking variable to zero if the plane/QC has landed
 		ii_AC_R = 0;
 	}
-	// PX4_INFO("PX4 Integral:\t%8.4f", (double)_rate_int(0));
-	// PX4_INFO("RCAC Integral:\t%8.4f", (double)_rcac_rate(0).get_rcac_integral());
+
 	torque = alpha_PID_rate*torque+u_k_rate;
 	z_km1_rate = z_k_rate;
 	u_km1_rate = u_k_rate;
@@ -156,6 +152,9 @@ void RateControl::updateIntegral(Vector3f &rate_error, const float dt)
 		if (PX4_ISFINITE(rate_i)) {
 			_rate_int(i) = math::constrain(rate_i, -_lim_int(i), _lim_int(i));
 		}
+
+		// Update RCAC Class Integral
+		_rcac_rate(i).update_integral(i_factor * rate_error(i), dt);
 	}
 }
 
