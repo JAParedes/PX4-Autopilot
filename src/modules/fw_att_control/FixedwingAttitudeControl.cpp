@@ -99,6 +99,12 @@ FixedwingAttitudeControl::parameters_update()
 	_roll_ctrl.set_k_ff(_param_fw_rr_ff.get());
 	_roll_ctrl.set_integrator_max(_param_fw_rr_imax.get());
 
+	/* roll RCAC parameters */
+	_roll_ctrl.set_RCAC_roll_P0(_param_fw_rcac_roll_p0.get());
+	_roll_ctrl.set_RCAC_roll_alpha(_param_fw_rcac_roll_alpha.get());
+	_roll_ctrl.set_RCAC_roll_Ru(_param_fw_rcac_roll_ru.get());
+	_roll_ctrl.set_RCAC_roll_SW(_param_fw_rcac_roll_sw.get());
+
 	/* yaw control parameters */
 	_yaw_ctrl.set_k_p(_param_fw_yr_p.get());
 	_yaw_ctrl.set_k_i(_param_fw_yr_i.get());

@@ -210,7 +210,12 @@ private:
 
 		(ParamFloat<px4::params::TRIM_PITCH>) _param_trim_pitch,
 		(ParamFloat<px4::params::TRIM_ROLL>) _param_trim_roll,
-		(ParamFloat<px4::params::TRIM_YAW>) _param_trim_yaw
+		(ParamFloat<px4::params::TRIM_YAW>) _param_trim_yaw,
+
+		(ParamFloat<px4::params::FW_RCAC_ROL_P0>) _param_fw_rcac_roll_p0,
+		(ParamFloat<px4::params::FW_RCAC_ROL_RU>) _param_fw_rcac_roll_ru,
+		(ParamFloat<px4::params::FW_RCAC_ROL_ALF>) _param_fw_rcac_roll_alpha,
+		(ParamBool<px4::params::FW_RCAC_ROL_SW>) _param_fw_rcac_roll_sw
 	)
 
 	ECL_RollController		_roll_ctrl;

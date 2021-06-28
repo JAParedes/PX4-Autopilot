@@ -66,16 +66,27 @@ public:
 	float control_euler_rate(const float dt, const ECL_ControlData &ctl_data) override;
 	float control_bodyrate(const float dt, const ECL_ControlData &ctl_data) override;
 
+	/* Initialize RCAC Variables */
 	void init_RCAC_roll();
 
-private:
 	/* RCAC Getter Functions - For Publishing */
+	int   get_RCAC_roll_ii() {return _rcac_roll.getkk();}
+	float get_RCAC_roll_Ru() {return rcac_roll_Ru;}
+	float get_RCAC_roll_Rz() {return rcac_roll_Rz;}
+	float get_RCAC_roll_P0() {return rcac_roll_P0;}
+	float get_RCAC_roll_P11() {return _rcac_roll.get_rcac_P(0, 0);}
+	float get_RCAC_roll_alpha() {return alpha_PID_roll;}
+	bool  get_RCAC_roll_switch() {return RCAC_roll_SW;}
+
 
 	/* RCAC Setter Functions - For Alteration in QGC */
-	void set_RCAC_roll_Ru(float roll_Ru)
-	{
-		rcac_roll_Ru = roll_Ru;
-	}
+	void set_RCAC_roll_Ru(float roll_Ru_in) {rcac_roll_Ru = roll_Ru_in;}
+	void set_RCAC_roll_Rz(float roll_Rz_in) {rcac_roll_Rz = roll_Rz_in;}
+	void set_RCAC_roll_P0(float roll_P0_in) {rcac_roll_P0 = roll_P0_in;}
+	void set_RCAC_roll_alpha(float roll_alpha_in) {alpha_PID_roll = roll_alpha_in;}
+	void set_RCAC_roll_SW(bool roll_SW_in) {RCAC_roll_SW = roll_SW_in;}
+
+private:
 
 	// Jun 24, 2021: New RCAC Variables
 	matrix::Matrix<float, RCAC_ROLL_L_RBLOCK, RCAC_ROLL_L_RBLOCK> rcac_roll_Rblock;
@@ -84,7 +95,7 @@ private:
 	float z_k_roll, z_km1_roll, u_k_roll, u_km1_roll;
 
 	bool RCAC_roll_SW = false;
-	bool RCAC_roll_Rblock_SW = false;
+	bool RCAC_roll_Rblock_SW = true;
 
 	int rcac_roll_e_fun = 0;
 	float rcac_roll_P0 = 0.0011f;
