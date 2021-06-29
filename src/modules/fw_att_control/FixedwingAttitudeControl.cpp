@@ -793,6 +793,7 @@ extern "C" __EXPORT int fw_att_control_main(int argc, char *argv[])
 /* RCAC Roll Controller Publisher Function */
 void FixedwingAttitudeControl::publish_rcac_roll_variables()
 {
+	// PX4_INFO("Entered FW Att Control RCAC Publisher");
 	_rcac_fw_roll.timestamp = hrt_absolute_time();
 	_rcac_fw_roll.ii_roll = _roll_ctrl.get_RCAC_roll_ii();
 	_rcac_fw_roll.alpha_pid_roll = _roll_ctrl.get_RCAC_roll_alpha();
