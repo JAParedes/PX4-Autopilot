@@ -771,7 +771,7 @@ PARAM_DEFINE_FLOAT(FW_DTRIM_P_FLPS, 0.0f);
  *
  * This P0 value is used to adjust sensitivity of RCAC.
  *
- * @group FW Attitude Control
+ * @group RCAC FW Params
  * @min 0.0
  * @max 10.0
  * @decimal 6
@@ -783,7 +783,7 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_P0, 0.0f);
  *
  * Ru is one of the parameters for adjusting RCAC performance.
  *
- * @group FW Attitude Control
+ * @group RCAC FW Params
  * @min -10.0
  * @max 10.0
  * @decimal 2
@@ -796,7 +796,7 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_RU, 0.0f);
  *
  * Can change this value to degrade controller performance
  *
- * @group FW Attitude Control
+ * @group RCAC FW Params
  * @min -10.0
  * @max 10.0
  * @decimal 2
@@ -807,6 +807,6 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_ALF, 0.0f);
  * Switch for enabling/disabling RCAC in the FW Roll Axis
  *
  * @boolean
- * @group FW Attitude Control
+ * @group RCAC FW Params
  */
 PARAM_DEFINE_INT32(FW_RCAC_ROL_SW, 0);

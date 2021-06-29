@@ -66,6 +66,8 @@
 #include <uORB/topics/vehicle_land_detected.h>
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/rcac_fw_roll.h>
+#include <uORB/topics/rcac_fw_pitch.h>
 
 using matrix::Eulerf;
 using matrix::Quatf;
@@ -115,6 +117,8 @@ private:
 	uORB::Publication<vehicle_attitude_setpoint_s>	_attitude_sp_pub;
 	uORB::Publication<vehicle_rates_setpoint_s>	_rate_sp_pub{ORB_ID(vehicle_rates_setpoint)};
 	uORB::PublicationMulti<rate_ctrl_status_s>	_rate_ctrl_status_pub{ORB_ID(rate_ctrl_status)};
+	uORB::Publication<rcac_fw_roll_s>     		_rcac_fw_roll_pub{ORB_ID(rcac_fw_roll)};
+	uORB::Publication<rcac_fw_pitch_s>     		_rcac_fw_pitch_pub{ORB_ID(rcac_fw_pitch)};
 
 	actuator_controls_s			_actuators {};		/**< actuator control inputs */
 	manual_control_setpoint_s		_manual_control_setpoint {};		/**< r/c channel data */
@@ -123,6 +127,8 @@ private:
 	vehicle_local_position_s		_local_pos {};		/**< local position */
 	vehicle_rates_setpoint_s		_rates_sp {};		/* attitude rates setpoint */
 	vehicle_status_s			_vehicle_status {};	/**< vehicle status */
+	rcac_fw_roll_s				_rcac_fw_roll{};     	/**< RCAC roll inspection data */
+	rcac_fw_pitch_s				_rcac_fw_pitch{};     	/**< RCAC pitch inspection data */
 
 	perf_counter_t	_loop_perf;			/**< loop performance counter */
 
@@ -237,4 +243,8 @@ private:
 	void		vehicle_land_detected_poll();
 
 	float 		get_airspeed_and_update_scaling();
+
+	/* RCAC FW Publishers */
+	void publish_rcac_roll_variables();
+	void publish_rcac_pitch_variables();
 };

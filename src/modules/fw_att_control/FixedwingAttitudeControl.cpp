@@ -655,6 +655,9 @@ void FixedwingAttitudeControl::Run()
 		    _vcontrol_mode.flag_control_manual_enabled) {
 			_actuators_0_pub.publish(_actuators);
 		}
+
+		publish_rcac_roll_variables();
+		// publish_rcac_pitch_variables();
 	}
 
 	perf_end(_loop_perf);
@@ -785,4 +788,30 @@ fw_att_control is the fixed wing attitude controller.
 extern "C" __EXPORT int fw_att_control_main(int argc, char *argv[])
 {
 	return FixedwingAttitudeControl::main(argc, argv);
+}
+
+/* RCAC Roll Controller Publisher Function */
+void FixedwingAttitudeControl::publish_rcac_roll_variables()
+{
+	_rcac_fw_roll.timestamp = hrt_absolute_time();
+	_rcac_fw_roll.ii_roll = _roll_ctrl.get_RCAC_roll_ii();
+	_rcac_fw_roll.alpha_pid_roll = _roll_ctrl.get_RCAC_roll_alpha();
+	_rcac_fw_roll.rcac_z_roll = _roll_ctrl.get_rate_error();
+	_rcac_fw_roll.rcac_u_roll = _roll_ctrl.get_RCAC_roll_uk();
+	_rcac_fw_roll.p11_roll = _roll_ctrl.get_RCAC_roll_P11();
+	_rcac_fw_roll.switch_roll = _roll_ctrl.get_RCAC_roll_switch();
+	matrix::Vector<float, 2> PX4_theta = _roll_ctrl.get_PX4_theta();
+	matrix::Vector<float, 2> RCAC_theta = _roll_ctrl.get_RCAC_theta();
+	for (int i = 0; i < 2; ++i) {
+		_rcac_fw_roll.px4_theta_roll[i] = PX4_theta(i);
+		_rcac_fw_roll.rcac_theta_roll[i] = RCAC_theta(i);
+	}
+
+	_rcac_fw_roll_pub.publish(_rcac_fw_roll);
+}
+
+/* RCAC Pitch Controller Publisher Function */
+void FixedwingAttitudeControl::publish_rcac_pitch_variables()
+{
+
 }

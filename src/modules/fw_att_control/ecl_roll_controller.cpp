@@ -113,25 +113,21 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
 		       + _integrator;
 
+	// TODO: Import the landed variable so that our implementation is consistent.
 	if (RCAC_roll_SW)
 	{
 		if (_rcac_roll.getkk() == 0) {
 			// Initial derivative will be zero.
-			z_km1_roll = z_k_roll;
-			u_km1_roll = u_k_roll;
+			init_RCAC_roll();
 		}
 
 		matrix::Matrix<float, 1, RCAC_ROLL_L_THETA> Phi_roll;
-		Phi_roll(0, 0) = z_k_roll;
+		Phi_roll(0, 0) = _rate_error;
 		Phi_roll(0, 1) = _rcac_roll.get_rcac_integral();
-		u_k_roll = _rcac_roll.compute_uk(z_k_roll, Phi_roll, u_km1_roll);
+		u_k_roll = _rcac_roll.compute_uk(_rate_error, Phi_roll, _rcac_roll.get_rcac_uk());
 	}
 
 	_last_output = alpha_PID_roll * _last_output + u_k_roll;
-
-	// Update km1 variables for next iteration.
-	z_km1_roll = z_k_roll;
-	u_km1_roll = u_k_roll;
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
@@ -159,4 +155,24 @@ void ECL_RollController::init_RCAC_roll()
 	{
 		_rcac_roll = RCAC<RCAC_ROLL_L_THETA, RCAC_ROLL_L_RBLOCK> (rcac_roll_P0, rcac_roll_lambda, rcac_roll_N, rcac_roll_e_fun, _integrator_max);
 	}
+}
+
+matrix::Vector<float, 2> ECL_RollController::get_RCAC_theta()
+{
+	matrix::Vector<float, 2> RCAC_theta;
+
+	for (size_t i = 0; i < 2; ++i)
+	{
+		RCAC_theta(i) = _rcac_roll.get_rcac_theta(i);
+	}
+	return RCAC_theta;
+}
+
+matrix::Vector<float, 2> ECL_RollController::get_PX4_theta()
+{
+	//TODO: Update this function if FF is being used with RCAC Later
+	matrix::Vector<float, 2> PX4_theta;
+	PX4_theta(0) = _k_p;
+	PX4_theta(1) = _k_i;
+	return PX4_theta;
 }

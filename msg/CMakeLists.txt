@@ -108,6 +108,8 @@ set(msg_files
 	radio_status.msg
 	rate_ctrl_status.msg
 	rcac_att_variables.msg
+	rcac_fw_pitch.msg
+	rcac_fw_roll.msg
 	rcac_pos_vel_variables.msg
 	rcac_rate_variables.msg
 	rc_channels.msg

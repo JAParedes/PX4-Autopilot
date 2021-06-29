@@ -76,8 +76,10 @@ public:
 	float get_RCAC_roll_P0() {return rcac_roll_P0;}
 	float get_RCAC_roll_P11() {return _rcac_roll.get_rcac_P(0, 0);}
 	float get_RCAC_roll_alpha() {return alpha_PID_roll;}
+	float get_RCAC_roll_uk() {return _rcac_roll.get_rcac_uk();}
 	bool  get_RCAC_roll_switch() {return RCAC_roll_SW;}
-
+	matrix::Vector<float, 2> get_RCAC_theta();
+	matrix::Vector<float, 2> get_PX4_theta();
 
 	/* RCAC Setter Functions - For Alteration in QGC */
 	void set_RCAC_roll_Ru(float roll_Ru_in) {rcac_roll_Ru = roll_Ru_in;}
