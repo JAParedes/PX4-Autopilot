@@ -43,6 +43,8 @@
 #include <lib/ecl/geo/geo.h>
 // #include <mathlib/mathlib.h>
 
+//TODO: Need to do params update based on QGC
+
 float ECL_RollController::control_attitude(const float dt, const ECL_ControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
