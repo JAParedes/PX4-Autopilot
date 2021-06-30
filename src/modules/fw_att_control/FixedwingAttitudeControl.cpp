@@ -430,6 +430,9 @@ void FixedwingAttitudeControl::Run()
 				_pitch_ctrl.reset_integrator();
 				_yaw_ctrl.reset_integrator();
 				_wheel_ctrl.reset_integrator();
+
+				// RCAC Resetter when Aircraft is On Grounds
+				_roll_ctrl.reset_RCAC_kk(); //TODO: Check Logic - Not sure if this is necessary or hurts performance in FW.
 			}
 
 			/* Prepare data for attitude controllers */

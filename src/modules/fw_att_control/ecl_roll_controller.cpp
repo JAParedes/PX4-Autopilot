@@ -129,6 +129,7 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 		u_k_roll = _rcac_roll.compute_uk(_rate_error, Phi_roll, _rcac_roll.get_rcac_uk());
 	}
 	else {
+		// reset_RCAC_kk(); //Resets RCAC Iterat
 		u_k_roll = 0;
 	}
 
@@ -180,4 +181,21 @@ matrix::Vector<float, 2> ECL_RollController::get_PX4_theta()
 	PX4_theta(0) = _k_p;
 	PX4_theta(1) = _k_i;
 	return PX4_theta;
+}
+
+void ECL_RollController::reset_integrator()
+{
+	_integrator = 0.0f;
+	_rcac_roll.reset_integral();
+}
+
+void ECL_RollController::set_integrator_max(float max)
+{
+	_integrator_max = max;
+	_rcac_roll.set_lim_int(max);
+}
+
+void ECL_RollController::reset_RCAC_kk()
+{
+	_rcac_roll.reset_kk();
 }

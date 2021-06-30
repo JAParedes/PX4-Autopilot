@@ -789,7 +789,7 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_P0, 0.0f);
  * @decimal 2
  * @increment 0.01
  */
-PARAM_DEFINE_FLOAT(FW_RCAC_ROL_RU, 0.0f);
+PARAM_DEFINE_FLOAT(FW_RCAC_ROL_RU, 1.0f);
 
 /**
  * Alpha value for scaling PID output
@@ -801,7 +801,7 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_RU, 0.0f);
  * @max 10.0
  * @decimal 2
  */
-PARAM_DEFINE_FLOAT(FW_RCAC_ROL_ALF, 0.0f);
+PARAM_DEFINE_FLOAT(FW_RCAC_ROL_ALF, 1.0f);
 
 /**
  * Switch for enabling/disabling RCAC in the FW Roll Axis

@@ -88,7 +88,7 @@ public:
 	void set_k_p(float k_p);
 	void set_k_i(float k_i);
 	void set_k_ff(float k_ff);
-	void set_integrator_max(float max);
+	virtual void set_integrator_max(float max); //Set to Virtual for RCAC Integrator Max
 	void set_max_rate(float max_rate);
 	void set_bodyrate_setpoint(float rate);
 
@@ -98,7 +98,7 @@ public:
 	float get_desired_bodyrate();
 	float get_integrator();
 
-	void reset_integrator();
+	virtual void reset_integrator(); //Set to Virtual for RCAC Integrator Reset
 
 protected:
 	uint64_t _last_run;

@@ -65,9 +65,12 @@ public:
 	float control_attitude(const float dt, const ECL_ControlData &ctl_data) override;
 	float control_euler_rate(const float dt, const ECL_ControlData &ctl_data) override;
 	float control_bodyrate(const float dt, const ECL_ControlData &ctl_data) override;
+	void reset_integrator() override;
+	void set_integrator_max(float max) override;
 
 	/* Initialize RCAC Variables */
 	void init_RCAC_roll();
+	void reset_RCAC_kk();
 
 	/* RCAC Getter Functions - For Publishing */
 	int   get_RCAC_roll_ii() {return _rcac_roll.getkk();}
@@ -82,11 +85,40 @@ public:
 	matrix::Vector<float, 2> get_PX4_theta();
 
 	/* RCAC Setter Functions - For Alteration in QGC */
-	void set_RCAC_roll_Ru(float roll_Ru_in) {rcac_roll_Ru = roll_Ru_in;}
-	void set_RCAC_roll_Rz(float roll_Rz_in) {rcac_roll_Rz = roll_Rz_in;}
-	void set_RCAC_roll_P0(float roll_P0_in) {rcac_roll_P0 = roll_P0_in;}
-	void set_RCAC_roll_alpha(float roll_alpha_in) {alpha_PID_roll = roll_alpha_in;}
-	void set_RCAC_roll_SW(bool roll_SW_in) {RCAC_roll_SW = roll_SW_in;}
+	void set_RCAC_roll_Ru(float roll_Ru_in)
+	{
+		// if (roll_Ru_in != rcac_roll_Ru)
+		PX4_INFO("[Roll RCAC] Ru Update: %6.4f", (double)roll_Ru_in);
+		rcac_roll_Ru = roll_Ru_in;
+	}
+
+	void set_RCAC_roll_Rz(float roll_Rz_in)
+	{
+		// if (rcac_roll_Rz != roll_Rz_in)
+		PX4_INFO("[Roll RCAC] Rz Update: %6.4f", (double)roll_Rz_in);
+		rcac_roll_Rz = roll_Rz_in;
+	}
+
+	void set_RCAC_roll_P0(float roll_P0_in)
+	{
+		// if (rcac_roll_P0 != roll_P0_in)
+		PX4_INFO("[Roll RCAC] P0 Update: %6.4f", (double)roll_P0_in);
+		rcac_roll_P0 = roll_P0_in;
+	}
+
+	void set_RCAC_roll_alpha(float roll_alpha_in)
+	{
+		// if (alpha_PID_roll != roll_alpha_in)
+		PX4_INFO("[Roll RCAC] Alpha Update: %6.4f", (double)roll_alpha_in);
+		alpha_PID_roll = roll_alpha_in;
+	}
+
+	void set_RCAC_roll_SW(bool roll_SW_in)
+	{
+		// if (RCAC_roll_SW != roll_SW_in)
+		PX4_INFO("[Roll RCAC] RCAC Switch Update: %s", roll_SW_in ? "true" : "false");
+		RCAC_roll_SW = roll_SW_in;
+	}
 
 private:
 
