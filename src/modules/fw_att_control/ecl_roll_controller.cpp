@@ -126,6 +126,9 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 		Phi_roll(0, 1) = _rcac_roll.get_rcac_integral();
 		u_k_roll = _rcac_roll.compute_uk(_rate_error, Phi_roll, _rcac_roll.get_rcac_uk());
 	}
+	else {
+		u_k_roll = 0;
+	}
 
 	_last_output = alpha_PID_roll * _last_output + u_k_roll;
 
