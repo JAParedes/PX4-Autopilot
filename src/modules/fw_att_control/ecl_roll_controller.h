@@ -49,7 +49,7 @@
 #ifndef ECL_ROLL_CONTROLLER_H
 #define ECL_ROLL_CONTROLLER_H
 
-#define RCAC_ROLL_L_THETA 2 // P-D Control RCAC
+#define RCAC_ROLL_L_THETA 2 // P-I Control RCAC
 #define RCAC_ROLL_L_RBLOCK 2
 
 #include "ecl_controller.h"
@@ -88,7 +88,7 @@ public:
 	void set_RCAC_roll_Ru(float roll_Ru_in)
 	{
 		// if (roll_Ru_in != rcac_roll_Ru)
-		PX4_INFO("[Roll RCAC] Ru Update: %6.4f", (double)roll_Ru_in);
+		PX4_INFO("[Roll RCAC Param Update] Ru: %6.4f", (double)roll_Ru_in);
 		rcac_roll_Ru = roll_Ru_in;
 	}
 
@@ -102,21 +102,21 @@ public:
 	void set_RCAC_roll_P0(float roll_P0_in)
 	{
 		// if (rcac_roll_P0 != roll_P0_in)
-		PX4_INFO("[Roll RCAC] P0 Update: %6.4f", (double)roll_P0_in);
+		PX4_INFO("[Roll RCAC Param Update] P0: %6.4f", (double)roll_P0_in);
 		rcac_roll_P0 = roll_P0_in;
 	}
 
 	void set_RCAC_roll_alpha(float roll_alpha_in)
 	{
 		// if (alpha_PID_roll != roll_alpha_in)
-		PX4_INFO("[Roll RCAC] Alpha Update: %6.4f", (double)roll_alpha_in);
+		PX4_INFO("[Roll RCAC Param Update] Alpha: %6.4f", (double)roll_alpha_in);
 		alpha_PID_roll = roll_alpha_in;
 	}
 
 	void set_RCAC_roll_SW(bool roll_SW_in)
 	{
 		// if (RCAC_roll_SW != roll_SW_in)
-		PX4_INFO("[Roll RCAC] RCAC Switch Update: %s", roll_SW_in ? "true" : "false");
+		PX4_INFO("[Roll RCAC Param Update] RCAC Switch: %s", roll_SW_in ? "true" : "false");
 		RCAC_roll_SW = roll_SW_in;
 	}
 

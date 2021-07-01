@@ -115,7 +115,7 @@ void LoggedTopics::add_default_topics()
 	add_topic("rcac_att_variables", 100);
 	add_topic("rcac_rate_variables", 100);
 	add_topic("rcac_fw_roll", 100);
-	// add_topic("rcac_fw_pitch", 100);
+	add_topic("rcac_fw_pitch", 100);
 
 
 

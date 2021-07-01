@@ -92,6 +92,12 @@ FixedwingAttitudeControl::parameters_update()
 	_pitch_ctrl.set_k_ff(_param_fw_pr_ff.get());
 	_pitch_ctrl.set_integrator_max(_param_fw_pr_imax.get());
 
+	/* pitch RCAC parameters */
+	_pitch_ctrl.set_RCAC_pitch_P0(_param_fw_rcac_pitch_p0.get());
+	_pitch_ctrl.set_RCAC_pitch_alpha(_param_fw_rcac_pitch_alpha.get());
+	_pitch_ctrl.set_RCAC_pitch_Ru(_param_fw_rcac_pitch_ru.get());
+	_pitch_ctrl.set_RCAC_pitch_SW(_param_fw_rcac_pitch_sw.get());
+
 	/* roll control parameters */
 	_roll_ctrl.set_time_constant(_param_fw_r_tc.get());
 	_roll_ctrl.set_k_p(_param_fw_rr_p.get());
@@ -660,7 +666,7 @@ void FixedwingAttitudeControl::Run()
 		}
 
 		publish_rcac_roll_variables();
-		// publish_rcac_pitch_variables();
+		publish_rcac_pitch_variables();
 	}
 
 	perf_end(_loop_perf);
@@ -817,5 +823,20 @@ void FixedwingAttitudeControl::publish_rcac_roll_variables()
 /* RCAC Pitch Controller Publisher Function */
 void FixedwingAttitudeControl::publish_rcac_pitch_variables()
 {
+	// PX4_INFO("Entered FW Att Control RCAC Publisher");
+	_rcac_fw_pitch.timestamp = hrt_absolute_time();
+	_rcac_fw_pitch.ii_pitch = _pitch_ctrl.get_RCAC_pitch_ii();
+	_rcac_fw_pitch.alpha_pid_pitch = _pitch_ctrl.get_RCAC_pitch_alpha();
+	_rcac_fw_pitch.rcac_z_pitch = _pitch_ctrl.get_rate_error();
+	_rcac_fw_pitch.rcac_u_pitch = _pitch_ctrl.get_RCAC_pitch_uk();
+	_rcac_fw_pitch.p11_pitch = _pitch_ctrl.get_RCAC_pitch_P11();
+	_rcac_fw_pitch.switch_pitch = _pitch_ctrl.get_RCAC_pitch_switch();
+	matrix::Vector<float, 2> PX4_theta = _pitch_ctrl.get_PX4_theta();
+	matrix::Vector<float, 2> RCAC_theta = _pitch_ctrl.get_RCAC_theta();
+	for (int i = 0; i < 2; ++i) {
+		_rcac_fw_pitch.px4_theta_pitch[i] = PX4_theta(i);
+		_rcac_fw_pitch.rcac_theta_pitch[i] = RCAC_theta(i);
+	}
 
+	_rcac_fw_pitch_pub.publish(_rcac_fw_pitch);
 }

@@ -767,9 +767,9 @@ PARAM_DEFINE_FLOAT(FW_DTRIM_R_FLPS, 0.0f);
 PARAM_DEFINE_FLOAT(FW_DTRIM_P_FLPS, 0.0f);
 
 /**
- * Initial P0 Value for RCAC
+ * Initial P0 Value for Roll RCAC
  *
- * This P0 value is used to adjust sensitivity of RCAC.
+ * This P0 value is used to adjust sensitivity of RCAC in Roll Axis.
  *
  * @group RCAC FW Params
  * @min 0.0
@@ -779,9 +779,9 @@ PARAM_DEFINE_FLOAT(FW_DTRIM_P_FLPS, 0.0f);
 PARAM_DEFINE_FLOAT(FW_RCAC_ROL_P0, 0.0f);
 
 /**
- * Ru value for RCAC
+ * Ru value for Roll RCAC
  *
- * Ru is one of the parameters for adjusting RCAC performance.
+ * Ru is one of the parameters for adjusting RCAC performance in Roll Axis.
  *
  * @group RCAC FW Params
  * @min -10.0
@@ -792,9 +792,9 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_P0, 0.0f);
 PARAM_DEFINE_FLOAT(FW_RCAC_ROL_RU, 1.0f);
 
 /**
- * Alpha value for scaling PID output
+ * Alpha value for scaling Roll PID output
  *
- * Can change this value to degrade controller performance
+ * Can change this value to degrade controller performance in Roll Axis
  *
  * @group RCAC FW Params
  * @min -10.0
@@ -810,3 +810,48 @@ PARAM_DEFINE_FLOAT(FW_RCAC_ROL_ALF, 1.0f);
  * @group RCAC FW Params
  */
 PARAM_DEFINE_INT32(FW_RCAC_ROL_SW, 0);
+
+/**
+ * Initial P0 Value for Pitch RCAC
+ *
+ * This P0 value is used to adjust sensitivity of RCAC in the Pitch Axis.
+ *
+ * @group RCAC FW Params
+ * @min 0.0
+ * @max 10.0
+ * @decimal 6
+ */
+PARAM_DEFINE_FLOAT(FW_RCAC_PTCH_P0, 0.0f);
+
+/**
+ * Ru value for Pitch RCAC
+ *
+ * Ru is one of the parameters for adjusting RCAC performance in the Pitch Axis.
+ *
+ * @group RCAC FW Params
+ * @min -10.0
+ * @max 10.0
+ * @decimal 2
+ * @increment 0.01
+ */
+PARAM_DEFINE_FLOAT(FW_RCAC_PTCH_RU, 1.0f);
+
+/**
+ * Alpha value for scaling Pitch PID output
+ *
+ * Can change this value to degrade controller performance in the Pitch Axis.
+ *
+ * @group RCAC FW Params
+ * @min -10.0
+ * @max 10.0
+ * @decimal 2
+ */
+PARAM_DEFINE_FLOAT(FW_RCAC_PTCH_ALF, 1.0f);
+
+/**
+ * Switch for enabling/disabling RCAC in the FW Pitch Axis
+ *
+ * @boolean
+ * @group RCAC FW Params
+ */
+PARAM_DEFINE_INT32(FW_RCAC_PTCH_SW, 0);

@@ -81,6 +81,10 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.body_y_rate;
 
+	/* Initialize RCAC on first iteration and roll switched on. */
+	if (RCAC_pitch_SW && _rcac_pitch.getkk() == 0)
+		init_RCAC_pitch();
+
 	if (!ctl_data.lock_integrator && _k_i > 0.0f) {
 
 		/* Integral term scales with 1/IAS^2 */
@@ -100,6 +104,10 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 
 		/* add and constrain */
 		_integrator = math::constrain(_integrator + id * _k_i, -_integrator_max, _integrator_max);
+
+		/* RCAC lib integrator (No gain with integral) */
+		if (RCAC_pitch_SW)
+			_rcac_pitch.update_integral(id, dt);
 	}
 
 	/* Apply PI rate controller and store non-limited output */
@@ -107,6 +115,20 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 	_last_output = _bodyrate_setpoint * _k_ff * ctl_data.scaler +
 		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
 		       + _integrator;
+
+	if (RCAC_pitch_SW)
+	{
+		matrix::Matrix<float, 1, RCAC_PITCH_L_THETA> Phi_pitch;
+		Phi_pitch(0, 0) = _rate_error;
+		Phi_pitch(0, 1) = _rcac_pitch.get_rcac_integral();
+		u_k_pitch = _rcac_pitch.compute_uk(_rate_error, Phi_pitch, _rcac_pitch.get_rcac_uk());
+	}
+	else {
+		// reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
+		u_k_pitch = 0;
+	}
+
+	_last_output = alpha_PID_pitch * _last_output + u_k_pitch;
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
@@ -120,4 +142,56 @@ float ECL_PitchController::control_euler_rate(const float dt, const ECL_ControlD
 	set_bodyrate_setpoint(_bodyrate_setpoint);
 
 	return control_bodyrate(dt, ctl_data);
+}
+
+void ECL_PitchController::init_RCAC_pitch()
+{
+	if (RCAC_pitch_Rblock_SW)
+	{
+		rcac_pitch_Rblock(0,0) = rcac_pitch_Rz;
+		rcac_pitch_Rblock(1,1) = rcac_pitch_Ru;
+		_rcac_pitch = RCAC<RCAC_PITCH_L_THETA, RCAC_PITCH_L_RBLOCK> (rcac_pitch_P0, rcac_pitch_lambda, rcac_pitch_Rblock, rcac_pitch_N, rcac_pitch_e_fun, _integrator_max);
+	}
+
+	else
+	{
+		_rcac_pitch = RCAC<RCAC_PITCH_L_THETA, RCAC_PITCH_L_RBLOCK> (rcac_pitch_P0, rcac_pitch_lambda, rcac_pitch_N, rcac_pitch_e_fun, _integrator_max);
+	}
+}
+
+matrix::Vector<float, 2> ECL_PitchController::get_RCAC_theta()
+{
+	matrix::Vector<float, 2> RCAC_theta;
+
+	for (size_t i = 0; i < 2; ++i)
+	{
+		RCAC_theta(i) = _rcac_pitch.get_rcac_theta(i);
+	}
+	return RCAC_theta;
+}
+
+matrix::Vector<float, 2> ECL_PitchController::get_PX4_theta()
+{
+	//TODO: Update this function if FF is being used with RCAC Later
+	matrix::Vector<float, 2> PX4_theta;
+	PX4_theta(0) = _k_p;
+	PX4_theta(1) = _k_i;
+	return PX4_theta;
+}
+
+void ECL_PitchController::reset_integrator()
+{
+	_integrator = 0.0f;
+	_rcac_pitch.reset_integral();
+}
+
+void ECL_PitchController::set_integrator_max(float max)
+{
+	_integrator_max = max;
+	_rcac_pitch.set_lim_int(max);
+}
+
+void ECL_PitchController::reset_RCAC_kk()
+{
+	_rcac_pitch.reset_kk();
 }

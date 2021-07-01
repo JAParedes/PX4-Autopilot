@@ -221,7 +221,12 @@ private:
 		(ParamFloat<px4::params::FW_RCAC_ROL_P0>) _param_fw_rcac_roll_p0,
 		(ParamFloat<px4::params::FW_RCAC_ROL_RU>) _param_fw_rcac_roll_ru,
 		(ParamFloat<px4::params::FW_RCAC_ROL_ALF>) _param_fw_rcac_roll_alpha,
-		(ParamBool<px4::params::FW_RCAC_ROL_SW>) _param_fw_rcac_roll_sw
+		(ParamBool<px4::params::FW_RCAC_ROL_SW>) _param_fw_rcac_roll_sw,
+
+		(ParamFloat<px4::params::FW_RCAC_PTCH_P0>) _param_fw_rcac_pitch_p0,
+		(ParamFloat<px4::params::FW_RCAC_PTCH_RU>) _param_fw_rcac_pitch_ru,
+		(ParamFloat<px4::params::FW_RCAC_PTCH_ALF>) _param_fw_rcac_pitch_alpha,
+		(ParamBool<px4::params::FW_RCAC_PTCH_SW>) _param_fw_rcac_pitch_sw
 	)
 
 	ECL_RollController		_roll_ctrl;
