@@ -124,8 +124,9 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 		u_k_pitch = _rcac_pitch.compute_uk(_rate_error, Phi_pitch, _rcac_pitch.get_rcac_uk());
 	}
 	else {
-		// reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
 		u_k_pitch = 0;
+		if (_rcac_pitch.getkk() != 0)
+			reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
 	}
 
 	_last_output = alpha_PID_pitch * _last_output + u_k_pitch;

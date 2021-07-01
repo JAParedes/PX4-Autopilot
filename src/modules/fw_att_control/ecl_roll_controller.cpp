@@ -117,20 +117,15 @@ float ECL_RollController::control_bodyrate(const float dt, const ECL_ControlData
 
 	if (RCAC_roll_SW)
 	{
-		/* Unnecessary for now because integral comes before this step and RCAC initialization happens above */
-		// if (_rcac_roll.getkk() == 0) {
-		// 	// Initial derivative will be zero.
-		// 	init_RCAC_roll();
-		// }
-
 		matrix::Matrix<float, 1, RCAC_ROLL_L_THETA> Phi_roll;
 		Phi_roll(0, 0) = _rate_error;
 		Phi_roll(0, 1) = _rcac_roll.get_rcac_integral();
 		u_k_roll = _rcac_roll.compute_uk(_rate_error, Phi_roll, _rcac_roll.get_rcac_uk());
 	}
 	else {
-		// reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
 		u_k_roll = 0;
+		if (_rcac_roll.getkk() != 0)
+			reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
 	}
 
 	_last_output = alpha_PID_roll * _last_output + u_k_roll;

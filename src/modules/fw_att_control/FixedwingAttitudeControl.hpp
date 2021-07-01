@@ -56,6 +56,7 @@
 #include <uORB/topics/airspeed_validated.h>
 #include <uORB/topics/battery_status.h>
 #include <uORB/topics/manual_control_setpoint.h>
+#include <uORB/topics/manual_control_switches.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/rate_ctrl_status.h>
 #include <uORB/topics/vehicle_angular_velocity.h>
@@ -110,6 +111,7 @@ private:
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};			/**< vehicle status subscription */
 	uORB::Subscription _vehicle_rates_sub{ORB_ID(vehicle_angular_velocity)};
+	uORB::Subscription _manual_control_switches_sub{ORB_ID(manual_control_switches)};
 
 	uORB::SubscriptionData<airspeed_validated_s> _airspeed_validated_sub{ORB_ID(airspeed_validated)};
 
@@ -129,6 +131,7 @@ private:
 	vehicle_status_s			_vehicle_status {};	/**< vehicle status */
 	rcac_fw_roll_s				_rcac_fw_roll{};     	/**< RCAC roll inspection data */
 	rcac_fw_pitch_s				_rcac_fw_pitch{};     	/**< RCAC pitch inspection data */
+	manual_control_switches_s 		_manual_control_switches{};
 
 	perf_counter_t	_loop_perf;			/**< loop performance counter */
 
