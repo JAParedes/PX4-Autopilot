@@ -236,13 +236,15 @@ MulticopterAttitudeControl::publish_rcac_att_variables()
 
 	_rcac_att_variables.p11_att = _attitude_control.get_RCAC_P11_Att();
 
+	_rcac_att_variables.rcac_att_ru = _attitude_control.get_RCAC_att_ru();
+	_rcac_att_variables.rcac_att_n = _attitude_control.get_RCAC_att_n();
+
 	for (int i = 0; i <= 2; i++) {
 		_rcac_att_variables.rcac_att_z[i] = _attitude_control.get_RCAC_att_z()(i);
 		_rcac_att_variables.rcac_att_u[i] = _attitude_control.get_RCAC_att_u()(i);
 		_rcac_att_variables.rcac_att_theta[i] = _attitude_control.get_RCAC_att_theta()(i);
 
 		_rcac_att_variables.px4_att_theta[i] = _attitude_control.get_PX4_att_theta()(i);
-
 	}
 	_rcac_att_variables_pub.publish(_rcac_att_variables);
 }

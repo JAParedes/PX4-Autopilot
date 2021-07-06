@@ -207,6 +207,9 @@ public:
 	 */
 	float get_alpha_PID_rate() {return alpha_PID_rate;}
 
+	float get_RCAC_rate_ru() {return _rcac_rate(0).get_rcac_Ru();}
+	float get_RCAC_rate_n() {return _rcac_rate(0).get_rcac_N();}
+
 
 	/**
 	 * 	Set the RCAC Rate switch.

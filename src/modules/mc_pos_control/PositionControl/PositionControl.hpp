@@ -360,6 +360,20 @@ public:
 	float get_RCAC_Ru_Vel() { return _rcac_vel(0,0).get_rcac_Ru(); }
 
 	/**
+	 * 	Get the
+	 *
+	 * 	@return RCAC N of the Position controller
+	 */
+	float get_RCAC_N_Pos() { return _rcac_pos(0,0).get_rcac_N(); }
+
+	/**
+	 * 	Get the
+	 *
+	 * 	@return RCAC N of the Velcity x controller
+	 */
+	float get_RCAC_N_Vel() { return _rcac_vel(0,0).get_rcac_N(); }
+
+	/**
 	 * 	Set P0 from value specified in mc_pos_control_params.c
 	 *
 	 */

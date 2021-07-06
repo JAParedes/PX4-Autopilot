@@ -186,10 +186,15 @@ public:
 	 */
 	float get_alpha_PID_att() {return alpha_PID_att;}
 
+	float get_RCAC_att_ru() {return _rcac_att(0).get_rcac_Ru();}
+	float get_RCAC_att_n() {return _rcac_att(0).get_rcac_N();}
+
+
 	/**
 	 * 	Set the RCAC Attitude switch.
 	 * 	@see RCAC_Aq_ON
 	 */
+
 	void set_RCAC_att_switch(float switch_RCAC)
 	{
 		RCAC_Aq_ON = 1;

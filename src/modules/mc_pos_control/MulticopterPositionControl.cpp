@@ -235,8 +235,10 @@ void MulticopterPositionControl::publish_rcac_pos_vel_variables(float pid_scale,
 	_rcac_pos_vel_variables.alpha_pid_vel = _control.get_pid_vel_alpha();
 	_rcac_pos_vel_variables.p11_pos = _control.get_RCAC_P11_Pos();
 	_rcac_pos_vel_variables.p11_velx = _control.get_RCAC_P11_Velx();
-	// _rcac_pos_vel_variables.ru_pos = _control.get_RCAC_Ru_Pos();
-	// _rcac_pos_vel_variables.ru_vel = _control.get_RCAC_Ru_Vel();
+	_rcac_pos_vel_variables.rcac_pos_ru = _control.get_RCAC_Ru_Pos();
+	_rcac_pos_vel_variables.rcac_vel_ru = _control.get_RCAC_Ru_Vel();
+	_rcac_pos_vel_variables.rcac_pos_n = _control.get_RCAC_N_Pos();
+	_rcac_pos_vel_variables.rcac_vel_n = _control.get_RCAC_N_Vel();
 
 	for (int i = 0; i <= 2; i++) {
 		_rcac_pos_vel_variables.rcac_pos_z[i] = _control.get_RCAC_pos_z()(i);
