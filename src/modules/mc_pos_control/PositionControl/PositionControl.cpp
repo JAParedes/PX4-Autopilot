@@ -143,13 +143,6 @@ void PositionControl::_positionControl(const bool landed)
 			{
 				init_RCAC_pos();
 				u_km1_pos = u_k_pos;
-
-				// std::cout << "\npos_Rblock_ON =" << rcac_pos_Rblock_ON << "\n";
-				// std::cout << "\npos_Rblock =" << rcac_pos_Rblock(0,0) << "\t" << rcac_pos_Rblock(1,1) << "\n";
-				// std::cout << "\npos_N =" << rcac_pos_N << "\n";
-				// std::cout << "\npos_P0 =" << rcac_pos_P0 << "\n";
-				// std::cout << "\npos_e_fun =" << rcac_pos_e_fun << "\n";
-				// std::cout << "\npos_PID_alpha =" << alpha_PID_pos << "\n\n";
 			}
 
 			for (int i = 0; i <= 2; i++)
@@ -162,10 +155,27 @@ void PositionControl::_positionControl(const bool landed)
 			}
 			u_km1_pos = u_k_pos;
 		}
+
+
+		// if ((rcac_pos_ON) && (pos_start == 0))		// spjohn - used for testing
+		// {
+		// 	std::cout << "\npos_Rblock_ON = " << rcac_pos_Rblock_ON;
+		// 	std::cout << "\npos_Rz = " << rcac_pos_Rblock(0,0);
+		// 	std::cout << "\npos_Ru = " << rcac_pos_Rblock(1,1);
+		// 	std::cout << "\npos_N = " << rcac_pos_N;
+		// 	std::cout << "\npos_P0 = " << rcac_pos_P0;
+		// 	std::cout << "\npos_e_fun = " << rcac_pos_e_fun << "\n\n";
+		// };
+		// if (pos_start == 200) {std::cout << "\npos_PID_alpha = " << alpha_PID_pos << "\n\n";};
+		// pos_start++;
+
 	}
 	else {init_RCAC_pos();};
 
-	// std::cout << "\nalpha_PID__pos =\t" << alpha_PID_pos << "\n";
+
+
+
+
 	vel_sp_position = alpha_PID_pos*vel_sp_position + u_k_pos;
 	// std::cout << "\nvel_sp_pos = [" << vel_sp_position(0) << ", " << vel_sp_position(1) << ", " << vel_sp_position(2) << "\n";
 	// std::cout << "\nvel_sp_pos(3) = FF =  " << vel_sp_position(3) << "\n";
@@ -201,13 +211,7 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 			{
 				init_RCAC_vel();
 				u_km1_vel = u_k_vel;
-				// std::cout << "\nvel_Rblock_ON =" << rcac_vel_Rblock_ON << "\n";
-				// std::cout << "\nRz = " << rcac_vel_Rblock(0,0) << "\n";
-				// std::cout << "\nRu = " << rcac_vel_Rblock(1,1) << "\n";
-				// std::cout << "\nvel_N = " << rcac_vel_N << "\n";
-				// std::cout << "\nvel_P0 = " << rcac_vel_P0 << "\n";
-				// std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n";
-				// std::cout << "\nvel_PID_alpha =" << alpha_PID_vel << "\n\n";
+
 			}
 
 			for (int i = 0; i <= 2; i++)
@@ -223,16 +227,33 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 			}
 			u_km1_vel = u_k_vel;
 		}
+
+
+		// if ((rcac_vel_ON) && (vel_start == 10))				// spjohn - used for testing
+		// {
+		// 	std::cout << "\nvel_Rblock_ON = " << rcac_vel_Rblock_ON;
+		// 	std::cout << "\nvel_Rz = " << rcac_vel_Rblock(0,0);
+		// 	std::cout << "\nvel_Ru = " << rcac_vel_Rblock(1,1);
+		// 	std::cout << "\nvel_N = " << rcac_vel_N;
+		// 	std::cout << "\nvel_P0 = " << rcac_vel_P0;
+		// 	std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n\n";
+		// };
+		// if (vel_start == 210){std::cout << "\nvel_PID_alpha = " << alpha_PID_vel << "\n\n";};
+		// vel_start++;
+
+		// std::cout << "\nz_k_vel = [" << z_k_vel(0) << ", " << z_k_vel(1) << ", " << z_k_vel(2) << "]";
+		// std::cout << "\nu_k_vel = [" << u_k_vel(0) << ", " << u_k_vel(1) << ", " << u_k_vel(2) << "]";
+		// std::cout << "\nRCAC_vel_theta_PID_x = [" << _rcac_vel(0,0).get_rcac_theta(0) << ", " << _rcac_vel(0,0).get_rcac_theta(1) << ", " << _rcac_vel(0,0).get_rcac_theta(2) << "]";
+		// std::cout << "\nRCAC_vel_theta_PID_y = [" << _rcac_vel(0,1).get_rcac_theta(0) << ", " << _rcac_vel(0,1).get_rcac_theta(1) << ", " << _rcac_vel(0,1).get_rcac_theta(2) << "]";
+		// std::cout << "\nRCAC_vel_theta_PID_z = [" << _rcac_vel(0,2).get_rcac_theta(0) << ", " << _rcac_vel(0,2).get_rcac_theta(1) << ", " << _rcac_vel(0,2).get_rcac_theta(2) << "]";
+		// std::cout << "\nRCAC_vel_kk_z = " << _rcac_vel(0,2).getkk() << "\n\n";
 	}
 	else {init_RCAC_vel();};
 
 	// std::cout << "\nacc_sp_velocity = [" << acc_sp_velocity(0) << ", " << acc_sp_velocity(1) << ", " << acc_sp_velocity(2) << "]\n";
-	// std::cout << "\nu_k_vel = [" << u_k_vel(0) << ", " << u_k_vel(1) << ", " << u_k_vel(2) << "]\n";
 
-	// std::cout << "\nalpha_PID__vel =\t" << alpha_PID_vel << "\n";
+
 	acc_sp_velocity = alpha_PID_vel*acc_sp_velocity + u_k_vel;
-
-
 
 	// No control input from setpoints or corresponding states which are NAN
 	ControlMath::addIfNotNanVector3f(_acc_sp, acc_sp_velocity);
@@ -372,10 +393,6 @@ const matrix::Vector3f PositionControl::get_RCAC_pos_theta()
 
 	for (int i = 0; i <= 2; i++) {
 		RCAC_theta(i) = _rcac_pos(0,i).get_rcac_theta(0);
-
-		// for (int j = 0; j <= 2; j++){
-		// 	PX4_INFO("RCAC_theta(%d):\t%8.6f", i, (double)_rcac_pos(0,i).get_rcac_theta(j));
-		// }
 	}
 
 	return RCAC_theta;

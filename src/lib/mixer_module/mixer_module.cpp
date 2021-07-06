@@ -37,6 +37,7 @@
 
 #include <uORB/Publication.hpp>
 #include <px4_platform_common/log.h>
+// #include <iostream>
 
 using namespace time_literals;
 
@@ -115,6 +116,7 @@ void MixingOutput::updateParams()
 		_mixers->set_thrust_factor(_param_thr_mdl_fac.get());
 		_mixers->set_airmode((Mixer::Airmode)_param_mc_airmode.get());
 	}
+
 }
 
 bool MixingOutput::updateSubscriptions(bool allow_wq_switch, bool limit_callbacks_to_primary)
@@ -442,11 +444,49 @@ bool MixingOutput::update()
 void
 MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_outputs_s &actuator_outputs)
 {
+	float beta_motor_FR = _param_beta_mot_fr.get();
+	int beta_motor_FR_sw = _param_beta_mot_fr_sw.get();
+
+	// std::cout << "\n[_min_val_fr, _max_val_fr] = [" << _min_value[0] << ", " << _max_value[0] << "]";
+
 	actuator_outputs.noutputs = num_outputs;
+
 
 	for (size_t i = 0; i < num_outputs; ++i) {
 		actuator_outputs.output[i] = _current_output_value[i];
 	}
+
+
+
+	// if ((beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
+	// {
+	// 	// PWM bounds (jmavsim): landed = 900, active = [1000, 2000]
+	// 	// minimum tolerable constraint on PWM upper limit = 1520
+	// 	// scale factors < 0.76 constrain the FR PWM upper limit to <= 1520
+	// 	float scale_factor_min = 0.76f;
+	// 	float pwm_upp_lim = _max_value[0] * scale_factor_min;
+	// 	actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
+
+	// 	std::cout << "\nactuator outputs = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n";
+	// }
+	// std::cout << "\n\nmax = " << _max_value[0] << ", min = " << _min_value[0] << "\n\n";
+
+	if ((beta_motor_FR < 1.0f) && (beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
+	{
+		float pwm_upp_lim = _max_value[0] * beta_motor_FR;
+
+		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
+		// std::cout << "\npwm_max = " << pwm_upp_lim;
+
+		// std::cout << "\nactuator output 0 (before) = " << actuator_outputs.output[0];
+		actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
+		// std::cout << "\nactuator output 0 (after) = " << actuator_outputs.output[0];
+
+		// actuator_outputs.output[0] = (int)(beta_motor_FR*pwm_max);
+
+		// std::cout << "\nactuator outputs (after) = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n\n";
+	}
+
 
 	actuator_outputs.timestamp = hrt_absolute_time();
 	_outputs_pub.publish(actuator_outputs);

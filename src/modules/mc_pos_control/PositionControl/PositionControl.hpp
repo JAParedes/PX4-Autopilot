@@ -427,6 +427,13 @@ private:
 	float _yaw_sp{}; /**< desired heading */
 	float _yawspeed_sp{}; /** desired yaw-speed */
 
+
+
+	// int pos_start = 0;	// spjohn - used for testing
+	// int vel_start = 0;
+
+
+
 	// RCAC -- Position Controller
 	matrix::Matrix<RCAC<RCAC_POS_L_THETA, RCAC_POS_L_RBLOCK>, 1, 3> _rcac_pos;
 	matrix::Matrix<float, 1, RCAC_POS_L_THETA> Phi_pos;
@@ -439,8 +446,9 @@ private:
 	float rcac_pos_Rz = 1.0;
 	float rcac_pos_Ru = 0.01;
 	float rcac_pos_lambda = 1.0;
-	float rcac_pos_N = -10;
+	float rcac_pos_N = -1.0;
 	float alpha_PID_pos = 1.0f;
+
 
 	// RCAC -- Velocity Controller
 	matrix::Matrix<RCAC<RCAC_VEL_L_THETA, RCAC_VEL_L_RBLOCK>, 1, 3> _rcac_vel;
@@ -454,6 +462,6 @@ private:
 	float rcac_vel_Rz = 1.0;
 	float rcac_vel_Ru = 1.0;
 	float rcac_vel_lambda = 1.0;
-	float rcac_vel_N = -10.0;
+	float rcac_vel_N = -0.1;
 	float alpha_PID_vel = 1.0f;
 };

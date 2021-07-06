@@ -69,3 +69,12 @@ PARAM_DEFINE_FLOAT(MOT_SLEW_MAX, 0.0f);
  * @group PWM Outputs
  */
 PARAM_DEFINE_FLOAT(THR_MDL_FAC, 0.0f);
+
+/**
+ * Value used to scale the FR propeller PWM output
+ *
+ * @min 0.0
+ * @max 1.0
+ * @group PWM Outputs
+ */
+PARAM_DEFINE_FLOAT(BETA_MOT_FR, 1.0f);

@@ -311,20 +311,6 @@ private:
   	// matrix::Matrix<float, 3,1> z_k_AC_R, z_km1_AC_R,u_k_AC_R, u_km1_AC_R;
 	// matrix::SquareMatrix<float, 3> Gamma_AC_R, I3, N1_Aw;
 
-	// New RCAC_Class_Variables
-	matrix::Vector<RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>, 3> _rcac_rate;
-	matrix::Matrix<float, RCAC_RATE_L_RBLOCK, RCAC_RATE_L_RBLOCK> rcac_rate_Rblock;
-	bool RCAC_Aw_ON=1;
-	bool rcac_rate_Rblock_ON = 1;
-	int rcac_rate_e_fun = 0;
-	float rcac_rate_P0 = 0.0011f;
-	float rcac_rate_Rz = 1.0;
-	float rcac_rate_Ru = 1.0;
-	float rcac_rate_lambda = 1.0;
-	float rcac_rate_N = -1.0;
-	float alpha_PID_rate = 1.0f;
-
-
 	matrix::SquareMatrix<float, 4> P_rate_x,P_rate_y,P_rate_z;
 	matrix::Matrix<float, 1,4> phi_k_rate_x, phi_km1_rate_x;
 	matrix::Matrix<float, 1,4> phi_k_rate_y, phi_km1_rate_y;
@@ -335,5 +321,23 @@ private:
 	matrix::Matrix<float, 1,1> dummy1,dummy2,dummy3;
 
 	//float alpha_PID = 1.0f;
+
+
+
+
+	// int rate_start = 0;	// spjohn - used for testing
+
+	// New RCAC_Class_Variables
+	matrix::Vector<RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>, 3> _rcac_rate;
+	matrix::Matrix<float, RCAC_RATE_L_RBLOCK, RCAC_RATE_L_RBLOCK> rcac_rate_Rblock;
+	bool RCAC_Aw_ON = 1;
+	bool rcac_rate_Rblock_ON = 1;
+	int rcac_rate_e_fun = 0;
+	float rcac_rate_P0 = 0.0011f;
+	float rcac_rate_Rz = 1.0;
+	float rcac_rate_Ru = 1.0;
+	float rcac_rate_lambda = 1.0;
+	float rcac_rate_N = -0.1;
+	float alpha_PID_rate = 1.0f;
 
 };

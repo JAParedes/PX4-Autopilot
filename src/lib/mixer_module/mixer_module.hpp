@@ -59,6 +59,9 @@
 class OutputModuleInterface : public px4::ScheduledWorkItem, public ModuleParams
 {
 public:
+
+
+
 	static constexpr int MAX_ACTUATORS = PWM_OUTPUT_MAX_CHANNELS;
 
 	OutputModuleInterface(const char *name, const px4::wq_config_t &config)
@@ -90,6 +93,8 @@ public:
 class MixingOutput : public ModuleParams
 {
 public:
+	// float beta_mot_FR = 1.0f;
+
 	static constexpr int MAX_ACTUATORS = OutputModuleInterface::MAX_ACTUATORS;
 
 	enum class SchedulingPolicy {
@@ -177,6 +182,7 @@ public:
 	int reorderedMotorIndex(int index) const;
 
 	void setIgnoreLockdown(bool ignore_lockdown) { _ignore_lockdown = ignore_lockdown; }
+	// void setBetaMotorFR(){beta_mot_FR = _param_beta_mot_fr.get();};
 
 protected:
 	void updateParams() override;
@@ -196,6 +202,7 @@ private:
 	void setAndPublishActuatorOutputs(unsigned num_outputs, actuator_outputs_s &actuator_outputs);
 	void publishMixerStatus(const actuator_outputs_s &actuator_outputs);
 	void updateLatencyPerfCounter(const actuator_outputs_s &actuator_outputs);
+
 
 	static int controlCallback(uintptr_t handle, uint8_t control_group, uint8_t control_index, float &input);
 
@@ -274,11 +281,17 @@ private:
 
 	perf_counter_t _control_latency_perf;
 
+
+
+
+
 	DEFINE_PARAMETERS(
 		(ParamInt<px4::params::MC_AIRMODE>) _param_mc_airmode,   ///< multicopter air-mode
 		(ParamFloat<px4::params::MOT_SLEW_MAX>) _param_mot_slew_max,
 		(ParamFloat<px4::params::THR_MDL_FAC>) _param_thr_mdl_fac, ///< thrust to motor control signal modelling factor
-		(ParamInt<px4::params::MOT_ORDERING>) _param_mot_ordering
+		(ParamInt<px4::params::MOT_ORDERING>) _param_mot_ordering,
+		(ParamFloat<px4::params::BETA_MOT_FR>) _param_beta_mot_fr,
+		(ParamInt<px4::params::BETA_MOT_FR_SW>) _param_beta_mot_fr_sw
 
 	)
 };

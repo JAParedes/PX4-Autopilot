@@ -33,3 +33,15 @@ PARAM_DEFINE_INT32(MC_AIRMODE, 0);
  * @group Mixer Output
  */
 PARAM_DEFINE_INT32(MOT_ORDERING, 0);
+
+/**
+ * Switch for beta PWM scaling factor used to degrade front-right motor
+ *
+ * ONLY supported for Quads.
+ *
+ * @value 0 Disabled
+ * @value 1 Active
+ *
+ * @group Mixer Output
+ */
+PARAM_DEFINE_INT32(BETA_MOT_FR_SW, 0);

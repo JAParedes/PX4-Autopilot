@@ -52,6 +52,7 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/mathlib.h>
 #include <px4_log.h>
+// #include <iostream>
 
 #define RCAC_ATT_L_THETA 1
 #define RCAC_ATT_L_RBLOCK 2
@@ -281,17 +282,21 @@ private:
   	matrix::Vector3f z_k_Pq_R, z_km1_Pq_R,u_k_Pq_R, u_km1_Pq_R;
 	matrix::SquareMatrix<float, 3> Gamma_Pq_R, I3, N1_Pq;
 
+
+
+	// int att_start = 0;		// spjohn - used for testing
+
 	// New RCAC_Class_Variables
 	matrix::Vector<RCAC<RCAC_ATT_L_THETA, RCAC_ATT_L_RBLOCK>, 3> _rcac_att;
 	matrix::Matrix<float, RCAC_ATT_L_RBLOCK, RCAC_ATT_L_RBLOCK> rcac_att_Rblock;
-	bool RCAC_Aq_ON=1;
+	bool RCAC_Aq_ON = 1;
 	bool rcac_att_Rblock_ON = 1;
 	int rcac_att_e_fun = 0;
 	float rcac_att_P0 = 0.011f;
 	float rcac_att_Rz = 1.0;
 	float rcac_att_Ru = 1.0;
 	float rcac_att_lambda = 1.0;
-	float rcac_att_N = -1.0;
+	float rcac_att_N = -0.1;
 	float alpha_PID_att = 1.0f;
 
 	//float alpha_PID = 1.0f;

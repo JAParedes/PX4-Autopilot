@@ -83,13 +83,10 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 				z_km1_rate = z_k_rate;
 				u_km1_rate = u_k_rate;
 
-				// std::cout << "\nrate_Rblock_ON =" << rcac_rate_Rblock_ON << "\n";
-				// std::cout << "\nrate_Rblock =" << rcac_rate_Rblock(0,0) << "\t" << rcac_rate_Rblock(1,1) << "\n";
-				// std::cout << "\nrate_N =" << rcac_rate_N << "\n";
-				// std::cout << "\nrate_P0 =" << rcac_rate_P0 << "\n";
-				// std::cout << "\nrate_e_fun =" << rcac_rate_e_fun << "\n";
-				// std::cout << "\nrate_PID_alpha =" << alpha_PID_rate << "\n\n";
+
 			}
+
+
 
 			// TODO: Sign of the integral term is unclear.
 			// Addition of a further rcac class with 3 vec and landing tracker will remove a lot of the logic here
@@ -105,6 +102,21 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 			}
 			++ii_AC_R;
 		}
+
+
+		// if ((RCAC_Aw_ON) && (rate_start == 30))		// spjohn - used for testing
+		// {
+		// 	std::cout << "\nrate_Rblock_ON = " << rcac_rate_Rblock_ON;
+		// 	std::cout << "\nrate_Rz = " << rcac_rate_Rblock(0,0);
+		// 	std::cout << "\nrate_Ru = " << rcac_rate_Rblock(1,1);
+		// 	std::cout << "\nrate_N = " << rcac_rate_N;
+		// 	std::cout << "\nrate_P0 = " << rcac_rate_P0;
+		// 	std::cout << "\nrate_e_fun = " << rcac_rate_e_fun << "\n\n";
+		// };
+		// if (rate_start == 230){std::cout << "\nrate_PID_alpha = " << alpha_PID_rate << "\n\n";};
+		// rate_start++;
+
+
 		for (int i = 0; i < 3; ++i) {
 			//RCAC lib method
 			_rcac_rate(i).update_integral(rate_error(i), dt);
@@ -117,6 +129,9 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 		// Set iteration tracking variable to zero if the plane/QC has landed
 		ii_AC_R = 0;
 	}
+
+
+
 	// PX4_INFO("PX4 Integral:\t%8.4f", (double)_rate_int(0));
 	// PX4_INFO("RCAC Integral:\t%8.4f", (double)_rcac_rate(0).get_rcac_integral());
 	torque = alpha_PID_rate*torque+u_k_rate;
