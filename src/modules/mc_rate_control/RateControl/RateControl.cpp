@@ -104,16 +104,16 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 		}
 
 
-		// if ((RCAC_Aw_ON) && (rate_start == 30))		// spjohn - used for testing
+		// if ((RCAC_Aw_ON) && (rate_start == 500))		// spjohn - used for testing
 		// {
-		// 	std::cout << "\nrate_Rblock_ON = " << rcac_rate_Rblock_ON;
-		// 	std::cout << "\nrate_Rz = " << rcac_rate_Rblock(0,0);
+		// 	// std::cout << "\nrate_Rblock_ON = " << rcac_rate_Rblock_ON;
+		// 	// std::cout << "\nrate_Rz = " << rcac_rate_Rblock(0,0);
 		// 	std::cout << "\nrate_Ru = " << rcac_rate_Rblock(1,1);
 		// 	std::cout << "\nrate_N = " << rcac_rate_N;
 		// 	std::cout << "\nrate_P0 = " << rcac_rate_P0;
 		// 	std::cout << "\nrate_e_fun = " << rcac_rate_e_fun << "\n\n";
 		// };
-		// if (rate_start == 230){std::cout << "\nrate_PID_alpha = " << alpha_PID_rate << "\n\n";};
+		// if (rate_start == 1500){std::cout << "\nrate_PID_alpha = " << alpha_PID_rate << "\n\n";};
 		// rate_start++;
 
 

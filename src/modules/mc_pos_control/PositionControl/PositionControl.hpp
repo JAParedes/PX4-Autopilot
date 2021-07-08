@@ -446,8 +446,6 @@ private:
 	// int pos_start = 0;	// spjohn - used for testing
 	// int vel_start = 0;
 
-
-
 	// RCAC -- Position Controller
 	matrix::Matrix<RCAC<RCAC_POS_L_THETA, RCAC_POS_L_RBLOCK>, 1, 3> _rcac_pos;
 	matrix::Matrix<float, 1, RCAC_POS_L_THETA> Phi_pos;
@@ -455,13 +453,14 @@ private:
 	matrix::Vector3f z_k_pos, u_k_pos, u_km1_pos;
 	bool rcac_pos_ON = 1;
 	int rcac_pos_Rblock_ON = 1;
-	int rcac_pos_e_fun = 0;
 	float rcac_pos_P0 = 0.005f;
 	float rcac_pos_Rz = 1.0;
 	float rcac_pos_Ru = 0.01;
 	float rcac_pos_lambda = 1.0;
-	float rcac_pos_N = -1.0;
 	float alpha_PID_pos = 1.0f;
+
+	float rcac_pos_N = -0.1;
+	int rcac_pos_e_fun = 0;
 
 
 	// RCAC -- Velocity Controller
@@ -471,11 +470,12 @@ private:
 	matrix::Vector3f z_k_vel, u_k_vel, u_km1_vel, Pv_intg;
 	bool rcac_vel_ON = 1;
 	int rcac_vel_Rblock_ON = 1;
-	int rcac_vel_e_fun = 0;
 	float rcac_vel_P0 = 0.001f;
 	float rcac_vel_Rz = 1.0;
 	float rcac_vel_Ru = 1.0;
 	float rcac_vel_lambda = 1.0;
-	float rcac_vel_N = -0.1;
 	float alpha_PID_vel = 1.0f;
+
+	float rcac_vel_N = -1.0;
+	int rcac_vel_e_fun = 0;
 };

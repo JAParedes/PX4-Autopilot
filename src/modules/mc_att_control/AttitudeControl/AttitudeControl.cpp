@@ -123,16 +123,16 @@ matrix::Vector3f AttitudeControl::update(const Quatf &q, const bool landed)
 		}
 
 
-		// if ((RCAC_Aq_ON) && (att_start == 20))				// spjohn - used for testing
+		// if ((RCAC_Aq_ON) && (att_start == 300))				// spjohn - used for testing
 		// {
-		// 	std::cout << "\natt_Rblock_ON = " << rcac_att_Rblock_ON;
-		// 	std::cout << "\natt_Rz = " << rcac_att_Rblock(0,0);
+		// 	// std::cout << "\natt_Rblock_ON = " << rcac_att_Rblock_ON;
+		// 	// std::cout << "\natt_Rz = " << rcac_att_Rblock(0,0);
 		// 	std::cout << "\natt_Ru = " << rcac_att_Rblock(1,1);
 		// 	std::cout << "\natt_N = " << rcac_att_N;
 		// 	std::cout << "\natt_P0 = " << rcac_att_P0;
 		// 	std::cout << "\natt_e_fun = " << rcac_att_e_fun << "\n\n";
 		// };
-		// if (att_start == 220){std::cout << "\natt_PID_alpha = " << alpha_PID_att << "\n\n";};
+		// if (att_start == 1400){std::cout << "\natt_PID_alpha = " << alpha_PID_att;};
 		// att_start++;
 
 	}

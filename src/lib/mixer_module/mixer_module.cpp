@@ -442,10 +442,53 @@ bool MixingOutput::update()
 }
 
 void
+MixingOutput::publish_rcac_pos_vel_variables()
+{
+	rcac_pos_vel_variables_s _rcac_pos_vel_variables{}; 	// spjohn		/**< RCAC variables */
+	_rcac_pos_vel_variables_sub.update(&_rcac_pos_vel_variables);
+
+	_rcac_pos_vel_variables.timestamp = hrt_absolute_time();
+	_rcac_pos_vel_variables.beta_mot_fr = beta_val;
+	_rcac_pos_vel_variables.beta_mot_fr_sw = beta_switch_ON;
+
+	_rcac_pos_vel_variables_pub.publish(_rcac_pos_vel_variables);
+}
+
+void
+MixingOutput::set_beta_switch(float beta_switch)
+{
+	beta_switch_ON = 0;
+	if (beta_switch > 0.0f)
+	{
+		beta_switch_ON = 1;
+	}
+	beta_val = _param_beta_mot_fr.get();
+
+	publish_rcac_pos_vel_variables();
+}
+
+void
 MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_outputs_s &actuator_outputs)
 {
-	float beta_motor_FR = _param_beta_mot_fr.get();
-	int beta_motor_FR_sw = _param_beta_mot_fr_sw.get();
+	_rc_channels_sub.update(&_rc_channels_switch);
+
+	float beta_switch = _rc_channels_switch.channels[15];
+	// SITL 1
+	beta_switch = 1.0f;
+	if (beta_switch > 0.0f)
+	{
+		set_beta_switch(_param_beta_mot_fr_sw.get());
+
+	}
+	else
+	{
+		set_beta_switch(beta_switch);
+	}
+
+
+
+	// float beta_motor_FR = _param_beta_mot_fr.get();
+	// int beta_motor_FR_sw = _param_beta_mot_fr_sw.get();
 
 	// std::cout << "\n[_min_val_fr, _max_val_fr] = [" << _min_value[0] << ", " << _max_value[0] << "]";
 
@@ -455,8 +498,6 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	for (size_t i = 0; i < num_outputs; ++i) {
 		actuator_outputs.output[i] = _current_output_value[i];
 	}
-
-
 
 	// if ((beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
 	// {
@@ -471,9 +512,9 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	// }
 	// std::cout << "\n\nmax = " << _max_value[0] << ", min = " << _min_value[0] << "\n\n";
 
-	if ((beta_motor_FR < 1.0f) && (beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
+	if ((beta_switch_ON) && (actuator_outputs.output[0] > 900.0f))
 	{
-		float pwm_upp_lim = _max_value[0] * beta_motor_FR;
+		float pwm_upp_lim = _max_value[0] * beta_val; 	//beta_motor_FR;
 
 		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
 		// std::cout << "\npwm_max = " << pwm_upp_lim;
@@ -486,7 +527,6 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 
 		// std::cout << "\nactuator outputs (after) = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n\n";
 	}
-
 
 	actuator_outputs.timestamp = hrt_absolute_time();
 	_outputs_pub.publish(actuator_outputs);

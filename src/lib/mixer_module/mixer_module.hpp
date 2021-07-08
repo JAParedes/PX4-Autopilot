@@ -38,6 +38,7 @@
 #include <lib/mixer/MixerGroup.hpp>
 #include <lib/perf/perf_counter.h>
 #include <lib/output_limit/output_limit.h>
+#include <lib/systemlib/mavlink_log.h>
 #include <px4_platform_common/atomic.h>
 #include <px4_platform_common/module_params.h>
 #include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
@@ -51,6 +52,8 @@
 #include <uORB/topics/multirotor_motor_limits.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/test_motor.h>
+#include <uORB/topics/rcac_pos_vel_variables.h>	// spjohn
+#include <uORB/topics/rc_channels.h>		// spjohn
 
 /**
  * @class OutputModuleInterface
@@ -184,6 +187,9 @@ public:
 	void setIgnoreLockdown(bool ignore_lockdown) { _ignore_lockdown = ignore_lockdown; }
 	// void setBetaMotorFR(){beta_mot_FR = _param_beta_mot_fr.get();};
 
+	bool beta_switch_ON = 0;
+	float beta_val = 1.0f;
+
 protected:
 	void updateParams() override;
 
@@ -245,9 +251,14 @@ private:
 
 	uORB::Subscription _armed_sub{ORB_ID(actuator_armed)};
 	uORB::SubscriptionCallbackWorkItem _control_subs[actuator_controls_s::NUM_ACTUATOR_CONTROL_GROUPS];
+	uORB::Subscription _rc_channels_sub{ORB_ID(rc_channels)}; 		// spjohn	/**< Switch from the RC channel */
+	// uORB::Subscription _rcac_pos_vel_variables_sub{ORB_ID(rcac_pos_vel_variables)};
 
 	uORB::PublicationMulti<actuator_outputs_s> _outputs_pub{ORB_ID(actuator_outputs)};
 	uORB::PublicationMulti<multirotor_motor_limits_s> _to_mixer_status{ORB_ID(multirotor_motor_limits)}; 	///< mixer status flags
+
+	uORB::Subscription _rcac_pos_vel_variables_sub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
+	uORB::Publication<rcac_pos_vel_variables_s> _rcac_pos_vel_variables_pub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
 
 	actuator_controls_s _controls[actuator_controls_s::NUM_ACTUATOR_CONTROL_GROUPS] {};
 	actuator_armed_s _armed{};
@@ -282,6 +293,7 @@ private:
 	perf_counter_t _control_latency_perf;
 
 
+	rc_channels_s	_rc_channels_switch{};			// spjohn		/**< Switch from the RC channel */
 
 
 
@@ -291,7 +303,18 @@ private:
 		(ParamFloat<px4::params::THR_MDL_FAC>) _param_thr_mdl_fac, ///< thrust to motor control signal modelling factor
 		(ParamInt<px4::params::MOT_ORDERING>) _param_mot_ordering,
 		(ParamFloat<px4::params::BETA_MOT_FR>) _param_beta_mot_fr,
-		(ParamInt<px4::params::BETA_MOT_FR_SW>) _param_beta_mot_fr_sw
+		(ParamFloat<px4::params::BETA_MOT_FR_SW>) _param_beta_mot_fr_sw
 
-	)
+	);
+
+	/**
+	 * Publish RCAC position and velocity variables for logging and mavlink send commands
+	 */
+	void publish_rcac_pos_vel_variables();
+
+	/**
+	 * Publish RCAC position and velocity variables for logging and mavlink send commands
+	 * @param beta_switch Denotes the state of the switch that enables beta.
+	 */
+	void set_beta_switch(float beta_switch);
 };

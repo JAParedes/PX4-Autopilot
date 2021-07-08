@@ -157,16 +157,16 @@ void PositionControl::_positionControl(const bool landed)
 		}
 
 
-		// if ((rcac_pos_ON) && (pos_start == 0))		// spjohn - used for testing
+		// if ((rcac_pos_ON) && (pos_start == 30))		// spjohn - used for testing
 		// {
-		// 	std::cout << "\npos_Rblock_ON = " << rcac_pos_Rblock_ON;
-		// 	std::cout << "\npos_Rz = " << rcac_pos_Rblock(0,0);
+		// 	// std::cout << "\npos_Rblock_ON = " << rcac_pos_Rblock_ON;
+		// 	// std::cout << "\npos_Rz = " << rcac_pos_Rblock(0,0);
 		// 	std::cout << "\npos_Ru = " << rcac_pos_Rblock(1,1);
 		// 	std::cout << "\npos_N = " << rcac_pos_N;
 		// 	std::cout << "\npos_P0 = " << rcac_pos_P0;
 		// 	std::cout << "\npos_e_fun = " << rcac_pos_e_fun << "\n\n";
 		// };
-		// if (pos_start == 200) {std::cout << "\npos_PID_alpha = " << alpha_PID_pos << "\n\n";};
+		// if (pos_start == 200) {std::cout << "\npos_PID_alpha = " << alpha_PID_pos;};
 		// pos_start++;
 
 	}
@@ -229,16 +229,16 @@ void PositionControl::_velocityControl(const float dt, const bool landed)
 		}
 
 
-		// if ((rcac_vel_ON) && (vel_start == 10))				// spjohn - used for testing
+		// if ((rcac_vel_ON) && (vel_start == 40))				// spjohn - used for testing
 		// {
-		// 	std::cout << "\nvel_Rblock_ON = " << rcac_vel_Rblock_ON;
-		// 	std::cout << "\nvel_Rz = " << rcac_vel_Rblock(0,0);
+		// 	// std::cout << "\nvel_Rblock_ON = " << rcac_vel_Rblock_ON;
+		// 	// std::cout << "\nvel_Rz = " << rcac_vel_Rblock(0,0);
 		// 	std::cout << "\nvel_Ru = " << rcac_vel_Rblock(1,1);
 		// 	std::cout << "\nvel_N = " << rcac_vel_N;
 		// 	std::cout << "\nvel_P0 = " << rcac_vel_P0;
 		// 	std::cout << "\nvel_e_fun = " << rcac_vel_e_fun << "\n\n";
 		// };
-		// if (vel_start == 210){std::cout << "\nvel_PID_alpha = " << alpha_PID_vel << "\n\n";};
+		// if (vel_start == 210){std::cout << "\nvel_PID_alpha = " << alpha_PID_vel;};
 		// vel_start++;
 
 		// std::cout << "\nz_k_vel = [" << z_k_vel(0) << ", " << z_k_vel(1) << ", " << z_k_vel(2) << "]";

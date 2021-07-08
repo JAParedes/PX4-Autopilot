@@ -4,6 +4,8 @@ uint64 timestamp			# time since system start (microseconds)
 
 float32 pid_factor			# PID scaling
 float32 rcac_master_sw			# Master RCAC switch
+float32 beta_mot_fr			# Gain that limits the QC FR motor PWM signal
+bool    beta_mot_fr_sw			# Switch for gain that limits the QC FR motor PWM signal
 
 uint64 ii_pos				# iteration step of the RCAC Position Controller
 bool switch_pos				# RCAC Position Controller switch

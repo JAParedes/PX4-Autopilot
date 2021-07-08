@@ -335,12 +335,13 @@ private:
 	matrix::Matrix<float, RCAC_RATE_L_RBLOCK, RCAC_RATE_L_RBLOCK> rcac_rate_Rblock;
 	bool RCAC_Aw_ON = 1;
 	bool rcac_rate_Rblock_ON = 1;
-	int rcac_rate_e_fun = 0;
 	float rcac_rate_P0 = 0.0011f;
 	float rcac_rate_Rz = 1.0;
 	float rcac_rate_Ru = 1.0;
 	float rcac_rate_lambda = 1.0;
-	float rcac_rate_N = -0.1;
 	float alpha_PID_rate = 1.0f;
+
+	float rcac_rate_N = -0.1;
+	int rcac_rate_e_fun = 0;
 
 };
