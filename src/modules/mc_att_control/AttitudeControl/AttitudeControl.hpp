@@ -300,7 +300,6 @@ private:
 	float rcac_att_Ru = 1.0;
 	float rcac_att_lambda = 1.0;
 	float alpha_PID_att = 1.0f;
-
 	float rcac_att_N = -1.0;
 	int rcac_att_e_fun = 0;
 

@@ -472,13 +472,16 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 {
 	_rc_channels_sub.update(&_rc_channels_switch);
 
-	float beta_switch = _rc_channels_switch.channels[15];
+	// RC channel 16 (SC) : ON  ~ 2000 ms =  1.0f
+	//			OFF ~ 1000 ms = -1.0f
+	float beta_switch = _rc_channels_switch.channels[16];
+
 	// SITL 1
-	beta_switch = 1.0f;
+	beta_switch = 1.0f;	// comment out this line to use RC input
 	if (beta_switch > 0.0f)
 	{
+		// NOTE: For HITL set BETA_MOT_FR_SW = 1.0 in QGC before flying
 		set_beta_switch(_param_beta_mot_fr_sw.get());
-
 	}
 	else
 	{
@@ -486,18 +489,30 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	}
 
 
-
-	// float beta_motor_FR = _param_beta_mot_fr.get();
-	// int beta_motor_FR_sw = _param_beta_mot_fr_sw.get();
-
-	// std::cout << "\n[_min_val_fr, _max_val_fr] = [" << _min_value[0] << ", " << _max_value[0] << "]";
-
 	actuator_outputs.noutputs = num_outputs;
-
 
 	for (size_t i = 0; i < num_outputs; ++i) {
 		actuator_outputs.output[i] = _current_output_value[i];
 	}
+
+
+	// beta is used to scale the upper-limit on the PWM signal sent to the FR (front right) motor
+	// and is meant to mimic partial actuator failure
+	// NOTE: 900.0f is the constant PWM value ouput to all QC actuators while landed
+	if ((beta_switch_ON) && (actuator_outputs.output[0] > 900.0f))
+	{
+		float pwm_upp_lim = _max_value[0] * beta_val; 	//beta_motor_FR;
+		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
+		// std::cout << "\npwm_max = " << pwm_upp_lim;
+		// std::cout << "\nactuator output 0 (before) = " << actuator_outputs.output[0];
+		actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
+		// std::cout << "\nactuator output 0 (after) = " << actuator_outputs.output[0];
+		// actuator_outputs.output[0] = (int)(beta_motor_FR*pwm_max);
+		// std::cout << "\nactuator outputs (after) = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n\n";
+	}
+
+	actuator_outputs.timestamp = hrt_absolute_time();
+	_outputs_pub.publish(actuator_outputs);
 
 	// if ((beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
 	// {
@@ -511,25 +526,6 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	// 	std::cout << "\nactuator outputs = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n";
 	// }
 	// std::cout << "\n\nmax = " << _max_value[0] << ", min = " << _min_value[0] << "\n\n";
-
-	if ((beta_switch_ON) && (actuator_outputs.output[0] > 900.0f))
-	{
-		float pwm_upp_lim = _max_value[0] * beta_val; 	//beta_motor_FR;
-
-		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
-		// std::cout << "\npwm_max = " << pwm_upp_lim;
-
-		// std::cout << "\nactuator output 0 (before) = " << actuator_outputs.output[0];
-		actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
-		// std::cout << "\nactuator output 0 (after) = " << actuator_outputs.output[0];
-
-		// actuator_outputs.output[0] = (int)(beta_motor_FR*pwm_max);
-
-		// std::cout << "\nactuator outputs (after) = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n\n";
-	}
-
-	actuator_outputs.timestamp = hrt_absolute_time();
-	_outputs_pub.publish(actuator_outputs);
 }
 
 void
