@@ -159,12 +159,12 @@ private:
 	bool RCAC_pitch_Rblock_SW = true;
 
 	int rcac_pitch_e_fun = 0;
-	float rcac_pitch_P0 = 0.0011f;
+	float rcac_pitch_P0 = 0.0011f;//
 	float rcac_pitch_Rz = 1.0;
-	float rcac_pitch_Ru = 1.0;
+	float rcac_pitch_Ru = 1.0;//
 	float rcac_pitch_lambda = 1.0;
-	float rcac_pitch_N = -1.0;
-	float alpha_PID_pitch = 1.0f;
+	float rcac_pitch_N = -1.0;//
+	float alpha_PID_pitch = 1.0f;//
 };
 
 #endif // ECL_PITCH_CONTROLLER_H

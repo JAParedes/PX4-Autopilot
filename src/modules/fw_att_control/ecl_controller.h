@@ -48,7 +48,11 @@
 
 #pragma once
 
+#define RCAC_RATE_L_THETA 2 // P-I Control RCAC
+#define RCAC_RATE_L_RBLOCK 2
+
 #include <drivers/drv_hrt.h>
+#include <mathlib/mathlib.h>
 #include <px4_log.h>
 
 struct ECL_ControlData {
@@ -114,4 +118,16 @@ protected:
 	float _rate_setpoint;
 	float _bodyrate_setpoint;
 	float constrain_airspeed(float airspeed, float minspeed, float maxspeed);
+
+	//RCAC implementation for Rate Controller.
+	RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK> _rcac_rate;
+	// bool  _rcac_rate_SW;
+	// bool  _rcac_rate_Rblock_SW;
+	// int   _rcac_rate_e_fun;
+	// float _rcac_rate_P0;
+	// float _rcac_rate_Rz;
+	// float _rcac_rate_Ru;
+	// float _rcac_rate_lambda;
+	// float _rcac_rate_N;
+	// float _rate_pid_alpha;
 };
