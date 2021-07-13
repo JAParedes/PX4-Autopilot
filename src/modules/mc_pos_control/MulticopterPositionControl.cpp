@@ -138,10 +138,22 @@ int MulticopterPositionControl::parameters_update(bool force)
 		_param_mpc_tko_speed.set(math::min(_param_mpc_tko_speed.get(), _param_mpc_z_vel_max_up.get()));
 		_param_mpc_land_speed.set(math::min(_param_mpc_land_speed.get(), _param_mpc_z_vel_max_dn.get()));
 
-		_control.set_RCAC_pos_vel_P0(_param_mpc_rcac_pos_P0.get(), _param_mpc_rcac_vel_P0.get());
-		_control.set_RCAC_pos_vel_Ru(_param_mpc_rcac_pos_Ru.get(), _param_mpc_rcac_vel_Ru.get());
-		_control.init_RCAC_pos();
-		_control.init_RCAC_vel();
+		if (_vehicle_land_detected_sub.updated()) {
+			vehicle_land_detected_s vehicle_land_detected;
+
+			if (_vehicle_land_detected_sub.copy(&vehicle_land_detected)) {
+				_landed = vehicle_land_detected.landed;
+				_maybe_landed = vehicle_land_detected.maybe_landed;
+			}
+		}
+		const bool landed = _maybe_landed || _landed;
+		if (landed)
+		{
+			_control.set_RCAC_pos_vel_P0(_param_mpc_rcac_pos_P0.get(), _param_mpc_rcac_vel_P0.get());
+			_control.set_RCAC_pos_vel_Ru(_param_mpc_rcac_pos_Ru.get(), _param_mpc_rcac_vel_Ru.get());
+			_control.init_RCAC_pos();
+			_control.init_RCAC_vel();
+		}
 	}
 
 	return OK;
@@ -220,6 +232,7 @@ void MulticopterPositionControl::set_vehicle_states(const float &vel_sp_z)
 
 void MulticopterPositionControl::publish_rcac_pos_vel_variables(float pid_scale, float rcac_switch)
 {
+	_rcac_pos_vel_variables_sub.update(&_rcac_pos_vel_variables);
 	_rcac_pos_vel_variables.timestamp = hrt_absolute_time();
 	// _rcac_pos_vel_variables.rcac_alpha[0] = _rc_channels_switch.channels[13];
 	// _rcac_pos_vel_variables.rcac_alpha[1] = _rc_channels_switch.channels[14];
@@ -235,8 +248,10 @@ void MulticopterPositionControl::publish_rcac_pos_vel_variables(float pid_scale,
 	_rcac_pos_vel_variables.alpha_pid_vel = _control.get_pid_vel_alpha();
 	_rcac_pos_vel_variables.p11_pos = _control.get_RCAC_P11_Pos();
 	_rcac_pos_vel_variables.p11_velx = _control.get_RCAC_P11_Velx();
-	// _rcac_pos_vel_variables.ru_pos = _control.get_RCAC_Ru_Pos();
-	// _rcac_pos_vel_variables.ru_vel = _control.get_RCAC_Ru_Vel();
+	_rcac_pos_vel_variables.rcac_pos_ru = _control.get_RCAC_Ru_Pos();
+	_rcac_pos_vel_variables.rcac_vel_ru = _control.get_RCAC_Ru_Vel();
+	_rcac_pos_vel_variables.rcac_pos_n = _control.get_RCAC_N_Pos();
+	_rcac_pos_vel_variables.rcac_vel_n = _control.get_RCAC_N_Vel();
 
 	for (int i = 0; i <= 2; i++) {
 		_rcac_pos_vel_variables.rcac_pos_z[i] = _control.get_RCAC_pos_z()(i);
@@ -256,6 +271,8 @@ void MulticopterPositionControl::publish_rcac_pos_vel_variables(float pid_scale,
 
 void MulticopterPositionControl::Run()
 {
+
+
 	if (should_exit()) {
 		_local_pos_sub.unregisterCallback();
 		exit_and_cleanup();

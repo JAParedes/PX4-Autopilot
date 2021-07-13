@@ -98,11 +98,11 @@ private:
 	uORB::Publication<rcac_pos_vel_variables_s>     _rcac_pos_vel_variables_pub{ORB_ID(rcac_pos_vel_variables)}; 		/**< RCAC variables log */
 
 
-
 	uORB::SubscriptionCallbackWorkItem _local_pos_sub{this, ORB_ID(vehicle_local_position)};	/**< vehicle local position */
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
+	uORB::Subscription _rcac_pos_vel_variables_sub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
 	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle control mode subscription */
 	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
 	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};

@@ -117,6 +117,9 @@ MulticopterRateControl::publish_rcac_rate_variables()
 
 	_rcac_rate_variables.p11_ratex = _rate_control.get_RCAC_P11_Ratex();
 
+	_rcac_rate_variables.rcac_rate_ru = _rate_control.get_RCAC_rate_ru();
+	_rcac_rate_variables.rcac_rate_n = _rate_control.get_RCAC_rate_n();
+
 	for (int i = 0; i <= 2; i++) {
 
 		_rcac_rate_variables.rcac_rate_z[i] = _rate_control.get_RCAC_rate_z()(i);
