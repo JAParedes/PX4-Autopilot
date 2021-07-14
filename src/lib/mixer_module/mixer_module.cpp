@@ -479,8 +479,8 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	float beta_switch = _rc_channels_switch.channels[15];
 	// PX4_INFO("\nCh16 RC switch - %8.6f",(double)beta_switch);
 
-	// SITL 1
-	// beta_switch = 1.0f;	// comment out this line to use RC input
+	// SITL
+	beta_switch = 1.0f;	// comment out this line to use RC input
 	if (beta_switch > 0.0f)
 	{
 		// NOTE: For HITL set BETA_MOT_FR_SW = 1.0 in QGC before flying
