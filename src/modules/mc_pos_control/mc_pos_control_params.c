@@ -842,7 +842,7 @@ PARAM_DEFINE_FLOAT(MPC_VEL_ALPHA, 1.0f);
  * @decimal 8
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_POS_P0, 0.005f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_POS_P0, 0.01f);
 
 /**
  * P0 for the velocity controller
@@ -852,7 +852,7 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_POS_P0, 0.005f);
  * @decimal 8
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_P0, 0.001f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_P0, 0.1f);
 
 /**
  * Ru for the position controller
@@ -862,7 +862,7 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_P0, 0.001f);
  * @decimal 8
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_POS_RU, 0.005f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_POS_RU, 0.01f);
 
 /**
  * Ru for the velocity controller
@@ -872,4 +872,4 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_POS_RU, 0.005f);
  * @decimal 8
  * @group Multicopter RCAC Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_RU, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_VEL_RU, 0.01f);

@@ -426,7 +426,7 @@ PARAM_DEFINE_FLOAT(MPC_RATE_ALPHA, 1.0f);
  * @decimal 8
  * @group Multicopter Attitude Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_P0, 0.000001f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_P0, 0.0001f);
 
 /**
  * Ru for the Rate controller
@@ -436,4 +436,4 @@ PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_P0, 0.000001f);
  * @decimal 8
  * @group Multicopter Attitude Control
  */
-PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_RU, 1.0f);
+PARAM_DEFINE_FLOAT(MPC_RCAC_RATE_RU, 0.1f);
