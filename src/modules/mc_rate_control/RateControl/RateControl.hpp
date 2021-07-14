@@ -328,7 +328,7 @@ private:
 
 
 
-	int rate_start = 0;	// spjohn - used for testing
+	// int rate_start = 0;	// spjohn - used for testing
 
 	// New RCAC_Class_Variables
 	matrix::Vector<RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>, 3> _rcac_rate;
