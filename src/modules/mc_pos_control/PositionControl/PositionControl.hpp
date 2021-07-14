@@ -475,5 +475,5 @@ private:
 	float rcac_vel_lambda = 1.0;
 	float alpha_PID_vel = 1.0f;
 	float rcac_vel_N = -1.0;
-	int rcac_vel_e_fun = 0;
+	int rcac_vel_e_fun = 5;
 };
