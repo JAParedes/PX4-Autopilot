@@ -438,6 +438,8 @@ bool MixingOutput::update()
 
 	handleCommands();
 
+	_rc_channels_sub.update(&_rc_channels_switch);
+
 	return true;
 }
 
@@ -474,9 +476,10 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 
 	// RC channel 16 (SC) : ON  ~ 2000 ms =  1.0f
 	//			OFF ~ 1000 ms = -1.0f
-	float beta_switch = _rc_channels_switch.channels[16];
+	float beta_switch = _rc_channels_switch.channels[15];
+	// PX4_INFO("\nCh16 RC switch - %8.6f",(double)beta_switch);
 
-	// SITL 1
+	// SITL
 	beta_switch = 1.0f;	// comment out this line to use RC input
 	if (beta_switch > 0.0f)
 	{
