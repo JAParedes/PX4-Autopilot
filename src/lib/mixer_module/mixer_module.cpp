@@ -502,7 +502,7 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 	// beta is used to scale the upper-limit on the PWM signal sent to the FR (front right) motor
 	// and is meant to mimic partial actuator failure
 	// NOTE: 900.0f is the constant PWM value ouput to all QC actuators while landed
-	if ((beta_switch_ON) && (actuator_outputs.output[0] > 900.0f))
+	if (beta_switch_ON)
 	{
 		float pwm_upp_lim = _max_value[0] * beta_val; 	//beta_motor_FR;
 		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
