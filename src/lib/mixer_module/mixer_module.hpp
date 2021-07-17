@@ -52,7 +52,8 @@
 #include <uORB/topics/multirotor_motor_limits.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/test_motor.h>
-#include <uORB/topics/rcac_pos_vel_variables.h>	// spjohn
+// #include <uORB/topics/rcac_pos_vel_variables.h>	// spjohn
+#include <uORB/topics/rcac_qc_beta_variables.h>	// spjohn
 #include <uORB/topics/rc_channels.h>		// spjohn
 
 /**
@@ -257,8 +258,9 @@ private:
 	uORB::PublicationMulti<actuator_outputs_s> _outputs_pub{ORB_ID(actuator_outputs)};
 	uORB::PublicationMulti<multirotor_motor_limits_s> _to_mixer_status{ORB_ID(multirotor_motor_limits)}; 	///< mixer status flags
 
-	uORB::Subscription _rcac_pos_vel_variables_sub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
-	uORB::Publication<rcac_pos_vel_variables_s> _rcac_pos_vel_variables_pub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
+	// uORB::Subscription _rcac_pos_vel_variables_sub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
+	// uORB::Publication<rcac_pos_vel_variables_s> _rcac_pos_vel_variables_pub{ORB_ID(rcac_pos_vel_variables)}; 	// spjohn		/**< RCAC variables log */
+	uORB::Publication<rcac_qc_beta_variables_s> _rcac_qc_beta_variables_pub{ORB_ID(rcac_qc_beta_variables)}; 	// spjohn
 
 	actuator_controls_s _controls[actuator_controls_s::NUM_ACTUATOR_CONTROL_GROUPS] {};
 	actuator_armed_s _armed{};
@@ -307,10 +309,10 @@ private:
 
 	);
 
-	/**
-	 * Publish RCAC position and velocity variables for logging and mavlink send commands
-	 */
-	void publish_rcac_pos_vel_variables();
+	// /**
+	//  * Publish RCAC position and velocity variables for logging and mavlink send commands
+	//  */
+	// void publish_rcac_qc_beta_variables();
 
 	/**
 	 * Publish RCAC position and velocity variables for logging and mavlink send commands

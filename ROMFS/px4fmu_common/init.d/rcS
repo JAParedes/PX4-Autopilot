@@ -622,5 +622,8 @@ mavlink stream -d /dev/ttyS2 -s RCAC_RATE_VARIABLES -r 2
 mavlink stream -d /dev/ttyACM0 -s RCAC_POS_VEL_VARIABLES -r 2
 mavlink stream -d /dev/ttyS1 -s RCAC_POS_VEL_VARIABLES -r 2
 mavlink stream -d /dev/ttyS2 -s RCAC_POS_VEL_VARIABLES -r 2
+mavlink stream -d /dev/ttyACM0 -s RCAC_QC_BETA_VARIABLES -r 2
+mavlink stream -d /dev/ttyS1 -s RCAC_QC_BETA_VARIABLES -r 2
+mavlink stream -d /dev/ttyS2 -s RCAC_QC_BETA_VARIABLES -r 2
 mavlink stream -d /dev/ttyS1 -s ODOMETRY -r 10
 mavlink stream -d /dev/ttyS2 -s LOCAL_POSITION_NED -10

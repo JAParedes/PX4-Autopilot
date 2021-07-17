@@ -110,6 +110,7 @@ set(msg_files
 	rcac_att_variables.msg
 	rcac_pos_vel_variables.msg
 	rcac_rate_variables.msg
+	rcac_qc_beta_variables.msg
 	rc_channels.msg
 	rc_parameter_map.msg
 	rpm.msg

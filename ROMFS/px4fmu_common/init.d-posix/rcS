@@ -289,3 +289,4 @@ replay trystart
 mavlink stream -r 2 -s RCAC_ATT_VARIABLES -u $udp_gcs_port_local
 mavlink stream -r 2 -s RCAC_RATE_VARIABLES -u $udp_gcs_port_local
 mavlink stream -r 2 -s RCAC_POS_VEL_VARIABLES -u $udp_gcs_port_local
+mavlink stream -r 2 -s RCAC_QC_BETA_VARIABLES -u $udp_gcs_port_local

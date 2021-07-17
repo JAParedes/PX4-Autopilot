@@ -443,18 +443,21 @@ bool MixingOutput::update()
 	return true;
 }
 
-void
-MixingOutput::publish_rcac_pos_vel_variables()
-{
-	rcac_pos_vel_variables_s _rcac_pos_vel_variables{}; 	// spjohn		/**< RCAC variables */
-	_rcac_pos_vel_variables_sub.update(&_rcac_pos_vel_variables);
+// void
+// MixingOutput::publish_rcac_qc_beta_variables()
+// {
+// 	rcac_qc_beta_variables_s _rcac_qc_beta_variables{}; 	// spjohn		/**< RCAC variables */
 
-	_rcac_pos_vel_variables.timestamp = hrt_absolute_time();
-	_rcac_pos_vel_variables.beta_mot_fr = beta_val;
-	_rcac_pos_vel_variables.beta_mot_fr_sw = beta_switch_ON;
+// 	_rcac_qc_beta_variables.timestamp = hrt_absolute_time();
+// 	_rcac_qc_beta_variables.beta_mot_fr = beta_val;
+// 	_rcac_qc_beta_variables.beta_mot_fr_sw = beta_switch_ON;
+// 	for (size_t i = 0; i < 5; ++i)
+// 	{
+// 		_rcac_qc_beta_variables.actuator_pwm_out[i] = _current_output_value[i];
+// 	}
 
-	_rcac_pos_vel_variables_pub.publish(_rcac_pos_vel_variables);
-}
+// 	_rcac_qc_beta_variables_pub.publish(_rcac_qc_beta_variables);
+// }
 
 void
 MixingOutput::set_beta_switch(float beta_switch)
@@ -464,19 +467,18 @@ MixingOutput::set_beta_switch(float beta_switch)
 	{
 		beta_switch_ON = 1;
 	}
-	beta_val = _param_beta_mot_fr.get();
-
-	publish_rcac_pos_vel_variables();
 }
 
 void
 MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_outputs_s &actuator_outputs)
 {
+	rcac_qc_beta_variables_s _rcac_qc_beta_variables{};
 	_rc_channels_sub.update(&_rc_channels_switch);
 
 	// RC channel 16 (SC) : ON  ~ 2000 ms =  1.0f
 	//			OFF ~ 1000 ms = -1.0f
 	float beta_switch = _rc_channels_switch.channels[15];
+	beta_val = _param_beta_mot_fr.get();
 	// PX4_INFO("\nCh16 RC switch - %8.6f",(double)beta_switch);
 
 	// SITL
@@ -491,44 +493,35 @@ MixingOutput::setAndPublishActuatorOutputs(unsigned num_outputs, actuator_output
 		set_beta_switch(beta_switch);
 	}
 
-
-	actuator_outputs.noutputs = num_outputs;
-
-	for (size_t i = 0; i < num_outputs; ++i) {
-		actuator_outputs.output[i] = _current_output_value[i];
-	}
-
-
 	// beta is used to scale the upper-limit on the PWM signal sent to the FR (front right) motor
 	// and is meant to mimic partial actuator failure
 	// NOTE: 900.0f is the constant PWM value ouput to all QC actuators while landed
 	if (beta_switch_ON)
 	{
-		float pwm_upp_lim = _max_value[0] * beta_val; 	//beta_motor_FR;
-		// std::cout << "\nbeta_motor_FR = " << beta_motor_FR;
-		// std::cout << "\npwm_max = " << pwm_upp_lim;
-		// std::cout << "\nactuator output 0 (before) = " << actuator_outputs.output[0];
-		actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
-		// std::cout << "\nactuator output 0 (after) = " << actuator_outputs.output[0];
-		// actuator_outputs.output[0] = (int)(beta_motor_FR*pwm_max);
-		// std::cout << "\nactuator outputs (after) = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n\n";
+		float pwm_upp_lim = (float)_max_value[0];
+		pwm_upp_lim = pwm_upp_lim * beta_val;
+
+		_current_output_value[0] = math::constrain(_current_output_value[0], _min_value[0], (uint16_t)pwm_upp_lim);
 	}
+	// std::cout << "\n_current_output_value[0] = " << _current_output_value[0] << "\n";
+	// publish_rcac_qc_beta_variables();
+
+
+
+	actuator_outputs.noutputs = num_outputs;
+
+	for (size_t i = 0; i < num_outputs; ++i)
+	{
+		actuator_outputs.output[i] = _current_output_value[i];
+		if (i < 6) {_rcac_qc_beta_variables.actuator_pwm_out[i] = _current_output_value[i];}
+	}
+	_rcac_qc_beta_variables.timestamp = hrt_absolute_time();
+	_rcac_qc_beta_variables.beta_mot_fr = beta_val;
+	_rcac_qc_beta_variables.beta_mot_fr_sw = beta_switch_ON;
+	_rcac_qc_beta_variables_pub.publish(_rcac_qc_beta_variables);
 
 	actuator_outputs.timestamp = hrt_absolute_time();
 	_outputs_pub.publish(actuator_outputs);
-
-	// if ((beta_motor_FR_sw) && (actuator_outputs.output[0] > 900.0f))
-	// {
-	// 	// PWM bounds (jmavsim): landed = 900, active = [1000, 2000]
-	// 	// minimum tolerable constraint on PWM upper limit = 1520
-	// 	// scale factors < 0.76 constrain the FR PWM upper limit to <= 1520
-	// 	float scale_factor_min = 0.76f;
-	// 	float pwm_upp_lim = _max_value[0] * scale_factor_min;
-	// 	actuator_outputs.output[0] = (int)math::constrain(actuator_outputs.output[0], (float)_min_value[0], pwm_upp_lim);
-
-	// 	std::cout << "\nactuator outputs = [" << actuator_outputs.output[0] << ", " << actuator_outputs.output[1] << ", " << actuator_outputs.output[2] << ", " << actuator_outputs.output[3] << "]\n";
-	// }
-	// std::cout << "\n\nmax = " << _max_value[0] << ", min = " << _min_value[0] << "\n\n";
 }
 
 void
