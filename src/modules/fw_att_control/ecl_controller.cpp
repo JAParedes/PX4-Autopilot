@@ -65,6 +65,8 @@ ECL_Controller::ECL_Controller() :
 	_rate_setpoint(0.0f),
 	_bodyrate_setpoint(0.0f)
 {
+	_rcac_rate_public_io = RCAC_Public_IO<RCAC_ATT_L_THETA, RCAC_ATT_L_RBLOCK>(&_rcac_rate);
+	_rcac_rate_params_io = RCACParams_IO(&_rcac_rate_params);
 }
 
 void ECL_Controller::reset_integrator()
@@ -142,4 +144,9 @@ float ECL_Controller::constrain_airspeed(float airspeed, float minspeed, float m
 	}
 
 	return airspeed_result;
+}
+
+void ECL_Controller::init_rcac_rate()
+{
+	_rcac_rate = RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK>(_rcac_rate_params);
 }

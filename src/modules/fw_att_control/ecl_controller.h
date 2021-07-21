@@ -51,6 +51,9 @@
 #define RCAC_RATE_L_THETA 2 // P-I Control RCAC
 #define RCAC_RATE_L_RBLOCK 2
 
+#define RCAC_ATT_L_THETA 1 // P Control RCAC
+#define RCAC_ATT_L_RBLOCK 2
+
 #include <drivers/drv_hrt.h>
 #include <mathlib/mathlib.h>
 #include <px4_log.h>
@@ -104,6 +107,13 @@ public:
 
 	virtual void reset_integrator(); //Set to Virtual for RCAC Integrator Reset
 
+	/* RCAC Rate Public Classes with Getter/Setters */
+	RCAC_Public_IO<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK> _rcac_rate_public_io;
+	RCACParams_IO _rcac_rate_params_io;
+
+	/* RCAC initializer */
+	void init_rcac_rate();
+
 protected:
 	uint64_t _last_run;
 	float _tc;
@@ -121,6 +131,10 @@ protected:
 
 	//RCAC implementation for Rate Controller.
 	RCAC<RCAC_RATE_L_THETA, RCAC_RATE_L_RBLOCK> _rcac_rate;
+	RCACParams _rcac_rate_params;
+
+	float z_k_rate, z_km1_rate, u_k_rate, u_km1_rate;
+
 	// bool  _rcac_rate_SW;
 	// bool  _rcac_rate_Rblock_SW;
 	// int   _rcac_rate_e_fun;

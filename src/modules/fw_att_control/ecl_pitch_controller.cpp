@@ -43,6 +43,12 @@
 #include <lib/ecl/geo/geo.h>
 #include <mathlib/mathlib.h>
 
+ECL_PitchController::ECL_PitchController() : ECL_Controller()
+{
+	_rcac_att_public_io = RCAC_Public_IO<RCAC_ATT_L_THETA, RCAC_ATT_L_RBLOCK>(&_rcac_att);
+	_rcac_att_params_io = RCACParams_IO(&_rcac_att_params);
+}
+
 float ECL_PitchController::control_attitude(const float dt, const ECL_ControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
@@ -59,6 +65,12 @@ float ECL_PitchController::control_attitude(const float dt, const ECL_ControlDat
 
 	/*  Apply P controller: rate setpoint from current error and time constant */
 	_rate_setpoint =  pitch_error / _tc;
+
+	matrix::Matrix<float, 1, RCAC_ATT_L_THETA> Phi_att;
+	Phi_att(0, 0) = pitch_error;
+	u_k_att = _rcac_att.compute_uk(_rate_error, Phi_att, _rcac_att.get_rcac_uk());
+
+	_rate_setpoint = _rcac_att_params.tuneParams.alpha_PID * _rate_setpoint + u_k_att;
 
 	return _rate_setpoint;
 }
@@ -81,8 +93,9 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.body_y_rate;
 
-	/* Initialize RCAC on first iteration and roll switched on. */
-	if (RCAC_pitch_SW && _rcac_pitch.getkk() == 0)
+	//TODO: Possibly not need this if RCAC_EN is modified directly instead of changing kk
+	/* Initialize RCAC on first iteration and rcac switched on. */
+	if (_rcac_rate_params.tuneParams.RCAC_EN && _rcac_rate.getkk() == 0)
 		init_RCAC_pitch();
 
 	if (!ctl_data.lock_integrator && _k_i > 0.0f) {
@@ -106,8 +119,8 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 		_integrator = math::constrain(_integrator + id * _k_i, -_integrator_max, _integrator_max);
 
 		/* RCAC lib integrator (No gain with integral) */
-		if (RCAC_pitch_SW)
-			_rcac_pitch.update_integral(id, dt);
+		if (_rcac_rate_params.tuneParams.RCAC_EN)
+			_rcac_rate.update_integral(id, dt);
 	}
 
 	/* Apply PI rate controller and store non-limited output */
@@ -116,19 +129,12 @@ float ECL_PitchController::control_bodyrate(const float dt, const ECL_ControlDat
 		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
 		       + _integrator;
 
-	if (RCAC_pitch_SW)
-	{
-		matrix::Matrix<float, 1, RCAC_PITCH_L_THETA> Phi_pitch;
-		Phi_pitch(0, 0) = _rate_error;
-		Phi_pitch(0, 1) = _rcac_pitch.get_rcac_integral();
-		u_k_pitch = _rcac_pitch.compute_uk(_rate_error, Phi_pitch, _rcac_pitch.get_rcac_uk());
-	}
-	else {
-		// reset_RCAC_kk(); //NOTE: Only Necessary if RCAC is toggled midflight
-		u_k_pitch = 0;
-	}
+	matrix::Matrix<float, 1, RCAC_PITCH_L_THETA> Phi_rate;
+	Phi_rate(0, 0) = _rate_error;
+	Phi_rate(0, 1) = _rcac_rate.get_rcac_integral();
+	u_k_rate = _rcac_rate.compute_uk(_rate_error, Phi_rate, _rcac_rate.get_rcac_uk());
 
-	_last_output = alpha_PID_pitch * _last_output + u_k_pitch;
+	_last_output = _last_output * _rcac_rate_params.tuneParams.alpha_PID +  u_k_rate;
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
@@ -144,32 +150,6 @@ float ECL_PitchController::control_euler_rate(const float dt, const ECL_ControlD
 	return control_bodyrate(dt, ctl_data);
 }
 
-void ECL_PitchController::init_RCAC_pitch()
-{
-	if (RCAC_pitch_Rblock_SW)
-	{
-		rcac_pitch_Rblock(0,0) = rcac_pitch_Rz;
-		rcac_pitch_Rblock(1,1) = rcac_pitch_Ru;
-		_rcac_pitch = RCAC<RCAC_PITCH_L_THETA, RCAC_PITCH_L_RBLOCK> (rcac_pitch_P0, rcac_pitch_lambda, rcac_pitch_Rblock, rcac_pitch_N, rcac_pitch_e_fun, _integrator_max);
-	}
-
-	else
-	{
-		_rcac_pitch = RCAC<RCAC_PITCH_L_THETA, RCAC_PITCH_L_RBLOCK> (rcac_pitch_P0, rcac_pitch_lambda, rcac_pitch_N, rcac_pitch_e_fun, _integrator_max);
-	}
-}
-
-matrix::Vector<float, 2> ECL_PitchController::get_RCAC_theta()
-{
-	matrix::Vector<float, 2> RCAC_theta;
-
-	for (size_t i = 0; i < 2; ++i)
-	{
-		RCAC_theta(i) = _rcac_pitch.get_rcac_theta(i);
-	}
-	return RCAC_theta;
-}
-
 matrix::Vector<float, 2> ECL_PitchController::get_PX4_theta()
 {
 	//TODO: Update this function if FF is being used with RCAC Later
@@ -182,16 +162,17 @@ matrix::Vector<float, 2> ECL_PitchController::get_PX4_theta()
 void ECL_PitchController::reset_integrator()
 {
 	_integrator = 0.0f;
-	_rcac_pitch.reset_integral();
+	_rcac_rate.reset_integral();
 }
 
+//TODO: Double check if this function is necessary
 void ECL_PitchController::set_integrator_max(float max)
 {
 	_integrator_max = max;
-	_rcac_pitch.set_lim_int(max);
+	_rcac_rate.set_lim_int(max);
 }
 
-void ECL_PitchController::reset_RCAC_kk()
-{
-	_rcac_pitch.reset_kk();
-}
+// void ECL_PitchController::reset_RCAC_kk()
+// {
+// 	_rcac_rate.reset_kk();
+// }
