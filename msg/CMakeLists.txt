@@ -110,6 +110,7 @@ set(msg_files
 	rcac_att_variables.msg
 	rcac_fw_pitch.msg
 	rcac_fw_roll.msg
+	rcac_fw_yaw.msg
 	rcac_pos_vel_variables.msg
 	rcac_rate_variables.msg
 	rc_channels.msg
